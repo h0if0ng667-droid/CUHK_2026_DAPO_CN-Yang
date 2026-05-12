@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>楊振寧 — 人生之旅 | 時空足跡地球儀</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#060914;color:#d4c5a0;font-family:'Noto Serif TC','Georgia',serif;overflow:hidden;height:100vh;width:100vw;user-select:none}
+#scene-container{position:absolute;top:0;left:0;width:100%;height:100%}
+.header{position:absolute;top:0;left:0;right:0;padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;z-index:10;pointer-events:none}
+.title-block{}
+.title-zh{font-size:26px;font-weight:700;color:#e8d5a3;letter-spacing:5px;text-shadow:0 0 30px rgba(232,213,163,0.2)}
+.title-en{font-family:'Playfair Display',serif;font-size:14px;font-weight:400;color:#7a6d55;letter-spacing:8px;text-transform:uppercase;margin-top:4px}
+.year-display{font-family:'Playfair Display',serif;font-size:13px;color:#4a4230;letter-spacing:4px;margin-top:8px}
+.header-right{display:flex;gap:8px;pointer-events:all}
+.lang-btn{background:rgba(232,213,163,0.06);border:1px solid rgba(232,213,163,0.15);color:#8a7d65;padding:5px 14px;font-family:'Noto Serif TC',serif;font-size:12px;cursor:pointer;border-radius:2px;transition:all .3s;letter-spacing:1px}
+.lang-btn:hover,.lang-btn.active{background:rgba(232,213,163,0.15);border-color:rgba(232,213,163,0.35);color:#d4c5a0}
+.timeline-panel{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(6,9,20,0.85);padding:16px 28px;border:1px solid rgba(232,213,163,0.08);border-radius:40px;backdrop-filter:blur(12px);display:flex;align-items:center;gap:20px;min-width:300px;justify-content:center}
+.timeline-label{font-family:'Playfair Display',serif;font-size:14px;color:#d4c5a0;letter-spacing:2px;cursor:pointer}
+.timeline-slider{-webkit-appearance:none;width:260px;height:2px;background:rgba(232,213,163,0.2);border-radius:2px;outline:none;cursor:pointer}
+.timeline-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#e8d5a3;border-radius:50%;cursor:pointer;box-shadow:0 0 8px rgba(232,213,163,0.6);border:none}
+.timeline-slider::-moz-range-thumb{width:16px;height:16px;background:#e8d5a3;border-radius:50%;cursor:pointer;border:none}
+.year-value{font-family:'Playfair Display',serif;font-size:16px;color:#e8d5a3;min-width:60px;text-align:center}
+.info-panel{position:absolute;right:32px;top:50%;transform:translateY(-50%);width:360px;background:rgba(8,11,24,0.94);border:1px solid rgba(232,213,163,0.2);border-radius:6px;padding:28px 24px;z-index:20;display:none;backdrop-filter:blur(18px);max-height:85vh;overflow-y:auto;box-shadow:0 0 28px rgba(0,0,0,0.6)}
+.info-panel.active{display:block}
+.info-panel::-webkit-scrollbar{width:4px}
+.info-panel::-webkit-scrollbar-thumb{background:rgba(232,213,163,0.2);border-radius:2px}
+.info-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#6a5d45;font-size:20px;cursor:pointer;padding:4px;line-height:1;transition:color .3s;z-index:1}
+.info-close:hover{color:#d4c5a0}
+.info-year{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#e8d5a3;line-height:1.2;letter-spacing:1px;margin-bottom:4px;padding-right:24px}
+.info-location{font-size:15px;font-weight:500;color:#c4b590;margin-top:4px;letter-spacing:1px}
+.info-location-en{font-family:'Playfair Display',serif;font-size:13px;color:#8a7d65;margin-top:2px;letter-spacing:1px}
+.info-divider{width:36px;height:1px;background:rgba(232,213,163,0.2);margin:16px 0}
+.info-title{font-size:15px;font-weight:600;color:#b8a880;margin-bottom:8px;letter-spacing:1px}
+.info-desc{font-size:13px;line-height:1.9;color:#b0a27a}
+.photo-gallery{margin-top:18px;width:100%;display:flex;flex-direction:column;gap:2px}
+.photo-item{width:100%;border:1px solid rgba(232,213,163,0.1);border-radius:4px;overflow:hidden;background:rgba(232,213,163,0.02)}
+.photo-item img{width:100%;height:auto;max-height:200px;object-fit:contain;display:block;background:#0a0d1a}
+.photo-caption{font-size:10px;color:#6a5d45;padding:6px 8px;text-align:center;letter-spacing:0.5px;border-top:1px solid rgba(232,213,163,0.06)}
+.photo-error{text-align:center;padding:12px 8px;color:#5a4e38;font-size:11px}
+.photo-more{text-align:center;padding:10px;color:#6a5d45;font-size:11px;letter-spacing:1px}
+.photo-empty{width:100%;min-height:80px;border:1px dashed rgba(232,213,163,0.15);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(232,213,163,0.02);padding:16px}
+.photo-icon{width:28px;height:28px;color:#3a3525;opacity:0.5}
+.photo-text{font-size:11px;color:#4a4030;margin-top:8px;text-align:center;line-height:1.6;letter-spacing:1px}
+.instruction{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);font-size:11px;color:#3a3525;letter-spacing:3px;z-index:5;background:rgba(6,9,20,0.4);padding:4px 12px;border-radius:20px;pointer-events:none;white-space:nowrap}
+.photo-nav{display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 0}
+.photo-nav-btn{background:rgba(232,213,163,0.1);border:1px solid rgba(232,213,163,0.2);color:#b0a27a;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.photo-nav-btn:hover{background:rgba(232,213,163,0.2);color:#e8d5a3}
+.photo-nav-btn:disabled{opacity:0.3;cursor:default}
+.photo-counter{font-size:11px;color:#6a5d45;letter-spacing:1px}
+@media(max-width:768px){
+.header{padding:16px 18px}
+.title-zh{font-size:18px;letter-spacing:3px}
+.title-en{font-size:11px}
+.timeline-panel{padding:12px 16px;gap:10px;min-width:auto}
+.timeline-slider{width:140px}
+.info-panel{width:92%;right:4%;top:auto;bottom:80px;transform:none;max-height:50vh}
+.info-year{font-size:22px}
+.instruction{font-size:10px;letter-spacing:2px}
+}
+</style>
+</head>
+<body>
+<div id="scene-container"></div>
+
+<div class="header">
+  <div class="title-block">
+    <div class="title-zh" id="titleZh">楊振寧 — 人生之旅</div>
+    <div class="title-en">Journey of Yang</div>
+    <div class="year-display" id="yearDisplay"></div>
+  </div>
+  <div class="header-right">
+    <button class="lang-btn active" id="btnZh" onclick="setLang('zh')">繁中</button>
+    <button class="lang-btn" id="btnEn" onclick="setLang('en')">EN</button>
+  </div>
+</div>
+
+<div class="timeline-panel">
+  <span class="timeline-label" onclick="document.getElementById('timelineSlider').stepDown();document.getElementById('timelineSlider').dispatchEvent(new Event('input'))">◀</span>
+  <input type="range" class="timeline-slider" id="timelineSlider" min="1920" max="2010" step="1">
+  <span class="timeline-label" onclick="document.getElementById('timelineSlider').stepUp();document.getElementById('timelineSlider').dispatchEvent(new Event('input'))">▶</span>
+  <div class="year-value" id="currentYearLabel">1924</div>
+</div>
+
+<div class="info-panel" id="infoPanel">
+  <button class="info-close" onclick="closeInfo()">✕</button>
+  <div class="info-year" id="infoYear"></div>
+  <div class="info-location" id="infoLocation"></div>
+  <div class="info-location-en" id="infoLocationEn"></div>
+  <div class="info-divider"></div>
+  <div class="info-title" id="infoTitle"></div>
+  <div class="info-desc" id="infoDesc"></div>
+  <div id="photoContainer"></div>
+</div>
+<div class="instruction" id="instruction">拖曳旋轉地球 · 點擊金色球體查看詳情 · 時間軸控制顯示範圍</div>
+
+<script>
+// =========================================================
+// 完整照片數據
+// =========================================================
+const photoData = [
+  {"id":20052,"itemName":"B01","time":"10个月大时","location":"合肥四古巷故居","people":"楊振寧, 父母","description":"與父母親","lat":31.8665676,"lng":117.281428,"fileName":"B01.jpg","imageUrl":""},
+  {"id":20060,"itemName":"B09","time":"1924年","location":"合肥","people":"楊力瑳, 楊振華, 楊振聲, 楊振寧","description":"楊力瑳與長女、長子及侄","lat":31.8665676,"lng":117.281428,"fileName":"B09.jpg","imageUrl":""},
+  {"id":20056,"itemName":"B05","time":"1925年前後","location":"芝加哥大學","people":"楊武之","description":"-","lat":41.9991492,"lng":-87.6573094,"fileName":"B05.jpg","imageUrl":""},
+  {"id":20057,"itemName":"B06","time":"1925年前後","location":"芝加哥大學","people":"楊武之","description":"-","lat":41.9991492,"lng":-87.6573094,"fileName":"B06.jpg","imageUrl":""},
+  {"id":20061,"itemName":"B10","time":"1925年前後","location":"芝加哥大學","people":"楊武之","description":"-","lat":41.9991492,"lng":-87.6573094,"fileName":"B10.jpg","imageUrl":""},
+  {"id":20062,"itemName":"B11","time":"1925年","location":"-","people":"楊羅孟華, 二奶奶, 振銘, 應生, 楊振寧, 振聲","description":"團體照","lat":null,"lng":null,"fileName":"B11.jpg","imageUrl":""},
+  {"id":20053,"itemName":"B02","time":"1926年","location":"合肥","people":"-","description":"-","lat":31.8665676,"lng":117.281428,"fileName":"B02.jpg","imageUrl":""},
+  {"id":20054,"itemName":"B03","time":"1927年前後","location":"合肥","people":"楊振寧, 楊羅孟華","description":"-","lat":31.8665676,"lng":117.281428,"fileName":"B03.jpg","imageUrl":""},
+  {"id":20058,"itemName":"B07","time":"1927年(?)","location":"合肥","people":"楊振寧, 堂姐, 堂兄弟","description":"-","lat":31.8665676,"lng":117.281428,"fileName":"B07.jpg","imageUrl":""},
+  {"id":20055,"itemName":"B04","time":"1929年","location":"廈門","people":"楊振寧, 父母","description":"-","lat":24.5438732,"lng":118.0768065,"fileName":"B04.jpg","imageUrl":""},
+  {"id":20059,"itemName":"B08","time":"1929年","location":"廈門鼓浪嶼日光岩","people":"-","description":"-","lat":24.444946,"lng":118.0622954,"fileName":"B08.jpg","imageUrl":""},
+  {"id":20073,"itemName":"C10","time":"1930年代","location":"-","people":"杜聿明","description":"-","lat":null,"lng":null,"fileName":"C10.jpg","imageUrl":""},
+  {"id":20064,"itemName":"C01","time":"1931年前後","location":"清華園","people":"鄭士京, 楊振寧, 吳人美, 熊秉明","description":"-","lat":39.998189,"lng":116.318831,"fileName":"C01.jpg","imageUrl":""},
+  {"id":20065,"itemName":"C02","time":"1931年前後","location":"清華園","people":"鄭士清, 鄭士京, 楊振寧","description":"-","lat":39.998189,"lng":116.318831,"fileName":"C02.jpg","imageUrl":""},
+  {"id":20066,"itemName":"C03","time":"1934年前後","location":"清華園","people":"-","description":"-","lat":39.998189,"lng":116.318831,"fileName":"C03.jpg","imageUrl":""},
+  {"id":20078,"itemName":"C15a","time":"1934年前後","location":"北平絨線胡同崇德中學","people":"-","description":"學校大樓","lat":39.917,"lng":116.374,"fileName":"C15.jpg","imageUrl":""},
+  {"id":20067,"itemName":"C04","time":"1935年","location":"清華園西院11號","people":"-","description":"-","lat":39.998,"lng":116.319,"fileName":"C04.jpg","imageUrl":""},
+  {"id":20070,"itemName":"C07","time":"1935年","location":"清華園","people":"楊振平","description":"-","lat":39.998189,"lng":116.318831,"fileName":"C07.jpg","imageUrl":""},
+  {"id":20071,"itemName":"C08","time":"1935年","location":"清華園","people":"楊振玉","description":"-","lat":39.998189,"lng":116.318831,"fileName":"C08.jpg","imageUrl":""},
+  {"id":20072,"itemName":"C09","time":"1935年","location":"清華園","people":"楊振漢","description":"-","lat":39.998189,"lng":116.318831,"fileName":"C09.jpg","imageUrl":""},
+  {"id":20075,"itemName":"C12","time":"1935年","location":"清華園西院11號","people":"楊振玉, 楊振平, 楊振漢, 楊振寧","description":"-","lat":39.998,"lng":116.319,"fileName":"C12.jpg","imageUrl":""},
+  {"id":20076,"itemName":"C13","time":"1935年","location":"清華園西院11號","people":"楊振平, 楊振玉, 楊振漢","description":"-","lat":39.998,"lng":116.319,"fileName":"C13.jpg","imageUrl":""},
+  {"id":20077,"itemName":"C14","time":"1938年","location":"漢口","people":"楊振聲, 楊振寧, 楊武之, 羅孟華, 楊振華, 楊振平, 楊振復, 楊振玉, 楊振漢","description":"家族合影","lat":30.6216514,"lng":114.2494144,"fileName":"C14.jpg","imageUrl":""},
+  {"id":20069,"itemName":"C06","time":"1939年","location":"昆明","people":"-","description":"-","lat":25.0186616,"lng":102.720287,"fileName":"C06.jpg","imageUrl":""},
+  {"id":20079,"itemName":"C15b","time":"1939年","location":"昆明西南聯大","people":"-","description":"學生宿舍","lat":25.0241287,"lng":102.667787,"fileName":"C15.jpg","imageUrl":""},
+  {"id":20082,"itemName":"D01","time":"1941年前後","location":"雲南路南石林","people":"張景昭","description":"-","lat":24.7529126,"lng":103.2701435,"fileName":"D01.jpg","imageUrl":""},
+  {"id":20099,"itemName":"D18","time":"1941年前後","location":"昆明西南聯大","people":"-","description":"新校舍北區宿舍","lat":25.0241287,"lng":102.667787,"fileName":"D18.jpg","imageUrl":""},
+  {"id":20100,"itemName":"D19","time":"1942年","location":"昆明西南聯大","people":"郭耀松, 劉導豐, 黃永泰, 戴傳曾, 向仁生, 婁良京, 楊振寧","description":"物理系1942級畢業生","lat":25.0241287,"lng":102.667787,"fileName":"D19.jpg","imageUrl":""},
+  {"id":20101,"itemName":"D20","time":"1942年","location":"昆明西北郊龍院村","people":"楊振漢, 楊振玉, 楊振平, 楊振復, 楊振寧","description":"-","lat":25.1,"lng":102.6,"fileName":"D20.jpg","imageUrl":""},
+  {"id":20083,"itemName":"D02","time":"1944年","location":"昆明","people":"-","description":"-","lat":25.0186616,"lng":102.720287,"fileName":"D02.jpg","imageUrl":""},
+  {"id":20085,"itemName":"D04","time":"1947年","location":"Ann Arbor","people":"李政道, 楊振寧, 朱光亞","description":"-","lat":42.2813722,"lng":-83.7484616,"fileName":"D04.jpg","imageUrl":""},
+  {"id":20087,"itemName":"D06","time":"1947年8月23日","location":"芝加哥大學","people":"凌寧, 李政道, 楊振寧","description":"遊歷美西出發前","lat":41.9991492,"lng":-87.6573094,"fileName":"D06.jpg","imageUrl":""},
+  {"id":20102,"itemName":"D21","time":"1947年","location":"Devil's Tower, Wyoming","people":"楊振寧","description":"-","lat":44.5905532,"lng":-104.7201586,"fileName":"D21.jpg","imageUrl":""},
+  {"id":20103,"itemName":"D22","time":"1947年","location":"-","people":"杜致禮","description":"-","lat":null,"lng":null,"fileName":"D22.jpg","imageUrl":""},
+  {"id":20108,"itemName":"D27","time":"1947年","location":"White Sands Park","people":"-","description":"-","lat":32.38,"lng":-106.48,"fileName":"D27-S.jpg","imageUrl":""},
+  {"id":20107,"itemName":"D26","time":"1948年","location":"Niagara","people":"-","description":"-","lat":43.0962143,"lng":-79.0377388,"fileName":"D26-S.jpg","imageUrl":""},
+  {"id":20111,"itemName":"D30","time":"1948年","location":"-","people":"楊振寧","description":"-","lat":null,"lng":null,"fileName":"D30.jpg","imageUrl":""},
+  {"id":20086,"itemName":"D05","time":"1949年","location":"芝加哥大學","people":"楊振寧, 鄧稼先, 楊振平","description":"-","lat":41.9991492,"lng":-87.6573094,"fileName":"D05.jpg","imageUrl":""},
+  {"id":20088,"itemName":"D07","time":"1949年","location":"紐約市吳大猷家中","people":"楊振寧, 吳大猷, 馬士俊","description":"-","lat":40.7127281,"lng":-74.0060152,"fileName":"D07.jpg","imageUrl":""},
+  {"id":20090,"itemName":"D09","time":"1949年","location":"紐約市","people":"杜致禮","description":"-","lat":40.7127281,"lng":-74.0060152,"fileName":"D09.JPG","imageUrl":""},
+  {"id":20092,"itemName":"D11","time":"1949年","location":"紐約市","people":"杜致禮","description":"-","lat":40.7127281,"lng":-74.0060152,"fileName":"D11.jpg","imageUrl":""},
+  {"id":20091,"itemName":"D10","time":"1949年秋","location":"Philadelphia","people":"-","description":"-","lat":39.9527237,"lng":-75.1635262,"fileName":"D10.jpg","imageUrl":""},
+  {"id":20110,"itemName":"D29","time":"1950年","location":"-","people":"楊振寧","description":"第一輛車子","lat":null,"lng":null,"fileName":"D29.jpg","imageUrl":""},
+  {"id":20089,"itemName":"D08","time":"1950年8月26日","location":"普林斯頓","people":"-","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"D08.JPG","imageUrl":""},
+  {"id":20093,"itemName":"D12","time":"1950年8月26日","location":"普林斯頓","people":"-","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"D12.jpg","imageUrl":""},
+  {"id":20094,"itemName":"D13","time":"1950年8月26日","location":"普林斯頓","people":"-","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"D13.jpg","imageUrl":""},
+  {"id":20095,"itemName":"D14","time":"1950年8月26日","location":"普林斯頓","people":"-","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"D14.jpg","imageUrl":""},
+  {"id":20125,"itemName":"E13","time":"1951年","location":"-","people":"楊振寧, 楊光諾","description":"-","lat":null,"lng":null,"fileName":"E13.jpg","imageUrl":""},
+  {"id":20131,"itemName":"E19","time":"1951年","location":"普林斯頓","people":"杜致禮, 楊振寧","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"E19.jpg","imageUrl":""},
+  {"id":20136,"itemName":"E24","time":"1951年","location":"-","people":"楊振寧, 楊光諾, 杜致禮","description":"-","lat":null,"lng":null,"fileName":"E24.jpg","imageUrl":""},
+  {"id":20145,"itemName":"E33","time":"1951(?)","location":"-","people":"-","description":"with the Lings","lat":null,"lng":null,"fileName":"E33.jpg","imageUrl":""},
+  {"id":20122,"itemName":"E10","time":"1953年秋","location":"東京","people":"杜致禮","description":"-","lat":35.6768601,"lng":139.7638947,"fileName":"E10.jpg","imageUrl":""},
+  {"id":20132,"itemName":"E32a","time":"1953年","location":"Kyoto","people":"-","description":"團體照","lat":35.0115754,"lng":135.7681441,"fileName":"E32.jpg","imageUrl":""},
+  {"id":20123,"itemName":"E11","time":"1954年春","location":"華府","people":"-","description":"-","lat":38.8950368,"lng":-77.0365427,"fileName":"E11.jpg","imageUrl":""},
+  {"id":20130,"itemName":"E18","time":"1954年春","location":"華府","people":"杜致禮","description":"-","lat":38.8950368,"lng":-77.0365427,"fileName":"E18.jpg","imageUrl":""},
+  {"id":20147,"itemName":"E35","time":"1954年春","location":"華府","people":"杜致禮","description":"-","lat":38.8950368,"lng":-77.0365427,"fileName":"E35-S.jpg","imageUrl":""},
+  {"id":20124,"itemName":"E12","time":"1954年夏","location":"舊金山","people":"-","description":"-","lat":37.7879363,"lng":-122.4075201,"fileName":"E12.jpg","imageUrl":""},
+  {"id":20126,"itemName":"E14","time":"1954年","location":"普林斯頓","people":"楊光諾, 愛因斯坦","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"E14.jpg","imageUrl":""},
+  {"id":20138,"itemName":"E26","time":"1954年","location":"-","people":"-","description":"奠定大師地位的論文","lat":null,"lng":null,"fileName":"E26.jpg","imageUrl":""},
+  {"id":20146,"itemName":"E34","time":"1955年","location":"-","people":"-","description":"-","lat":null,"lng":null,"fileName":"E34-S.jpg","imageUrl":""},
+  {"id":20139,"itemName":"E27","time":"1956年","location":"-","people":"楊振寧, 李政道","description":"合寫的論文","lat":null,"lng":null,"fileName":"E27.jpg","imageUrl":""},
+  {"id":20114,"itemName":"E02","time":"1957年","location":"-","people":"吳大猷","description":"致吳大猷的信","lat":null,"lng":null,"fileName":"E02.jpg","imageUrl":""},
+  {"id":20115,"itemName":"E03","time":"1957年","location":"-","people":"吳大猷","description":"吳大猷回信","lat":null,"lng":null,"fileName":"E03.jpg","imageUrl":""},
+  {"id":20118,"itemName":"E06","time":"1957年","location":"斯得哥爾摩","people":"-","description":"諾貝爾宴會後","lat":59.3251172,"lng":18.0710935,"fileName":"E06.jpg","imageUrl":""},
+  {"id":20127,"itemName":"E15","time":"1957年","location":"-","people":"-","description":"諾貝爾獎章與獎狀","lat":null,"lng":null,"fileName":"E15-np1.jpg","imageUrl":""},
+  {"id":20128,"itemName":"E16","time":"1957年","location":"-","people":"-","description":"諾貝爾獎章","lat":null,"lng":null,"fileName":"E16-np2.jpg","imageUrl":""},
+  {"id":20129,"itemName":"E17","time":"1957年","location":"-","people":"-","description":"諾貝爾獎章","lat":null,"lng":null,"fileName":"E17-np3.jpg","imageUrl":""},
+  {"id":20134,"itemName":"E22","time":"1957年","location":"日內瓦","people":"楊武之, 楊光諾, 楊振寧","description":"-","lat":46.2017559,"lng":6.1466014,"fileName":"E22.jpg","imageUrl":""},
+  {"id":20135,"itemName":"E23","time":"1957年","location":"Stockholm","people":"杜致禮, 楊振寧","description":"-","lat":59.3251172,"lng":18.0710935,"fileName":"E23.jpg","imageUrl":""},
+  {"id":20137,"itemName":"E25","time":"1957年","location":"日內瓦","people":"楊武之, 楊光諾, 杜致禮, 楊振寧","description":"第一次團聚","lat":46.2017559,"lng":6.1466014,"fileName":"E25.jpg","imageUrl":""},
+  {"id":20140,"itemName":"E28","time":"1957年","location":"-","people":"楊振寧, 李政道","description":"-","lat":null,"lng":null,"fileName":"E28.jpg","imageUrl":""},
+  {"id":20141,"itemName":"E29","time":"1957年","location":"-","people":"楊振寧, 李政道","description":"-","lat":null,"lng":null,"fileName":"E29.jpg","imageUrl":""},
+  {"id":20142,"itemName":"E30","time":"1957年","location":"-","people":"楊振寧, 李政道","description":"-","lat":null,"lng":null,"fileName":"E30.jpg","imageUrl":""},
+  {"id":20148,"itemName":"E36","time":"1957年","location":"-","people":"楊振寧, 李政道","description":"-","lat":null,"lng":null,"fileName":"E36.jpg","imageUrl":""},
+  {"id":20149,"itemName":"E37","time":"1957年","location":"Rochester","people":"CNY, Feynmann","description":"-","lat":43.157285,"lng":-77.615214,"fileName":"E37.jpg","imageUrl":""},
+  {"id":20117,"itemName":"E05","time":"1957年12月10日","location":"斯得哥爾摩","people":"楊振寧","description":"接受諾貝爾獎章","lat":59.3251172,"lng":18.0710935,"fileName":"E05.jpg","imageUrl":""},
+  {"id":20119,"itemName":"E07","time":"1957年12月10日","location":"斯得哥爾摩","people":"杜致禮, 瑞典國王","description":"-","lat":59.3251172,"lng":18.0710935,"fileName":"E07.jpg","imageUrl":""},
+  {"id":20120,"itemName":"E08","time":"1957年12月10日","location":"斯得哥爾摩","people":"-","description":"諾貝爾獎典禮","lat":59.3251172,"lng":18.0710935,"fileName":"E08.jpg","imageUrl":""},
+  {"id":20121,"itemName":"E09","time":"1950年代後期","location":"-","people":"-","description":"-","lat":null,"lng":null,"fileName":"E09.jpg","imageUrl":""},
+  {"id":20144,"itemName":"E32b","time":"1950年代","location":"普林斯頓","people":"Franklin Yang, James Lee, Steven Lee, 楊振寧, 杜致禮, 秦惠, 李政道","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"E32.jpg","imageUrl":""},
+  {"id":20116,"itemName":"E04","time":"1950年代初","location":"-","people":"胡適","description":"胡適書贈","lat":null,"lng":null,"fileName":"E04.jpg","imageUrl":""},
+  {"id":20158,"itemName":"F05","time":"1960年代","location":"上海","people":"楊武之","description":"-","lat":31.2312707,"lng":121.4700152,"fileName":"F05.jpg","imageUrl":""},
+  {"id":20160,"itemName":"F07","time":"1960年代後期","location":"-","people":"-","description":"-","lat":null,"lng":null,"fileName":"F07.jpg","imageUrl":""},
+  {"id":20161,"itemName":"F08","time":"1961年前後","location":"Princeton","people":"李政道, 楊振寧","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"F08.jpg","imageUrl":""},
+  {"id":20163,"itemName":"F10","time":"1961年前後","location":"Princeton","people":"Pais, Dyson, 楊振寧, 李政道","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"F10.jpg","imageUrl":""},
+  {"id":20164,"itemName":"F11","time":"1961年前後","location":"Princeton","people":"Pais, 李政道, 楊振寧, Dyson","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"F11.jpg","imageUrl":""},
+  {"id":20154,"itemName":"F01","time":"1962年5月21日","location":"日內瓦機場","people":"楊振寧, 楊武之","description":"-","lat":46.2378164,"lng":6.1081212,"fileName":"F01.jpg","imageUrl":""},
+  {"id":20165,"itemName":"F12","time":"1962年5月21日","location":"日內瓦機場","people":"楊振寧, 楊武之, 楊羅孟華","description":"-","lat":46.2378164,"lng":6.1081212,"fileName":"F12.jpg","imageUrl":""},
+  {"id":20155,"itemName":"F02","time":"1962年","location":"日內瓦","people":"陳省身, 楊武之","description":"-","lat":46.2017559,"lng":6.1466014,"fileName":"F02.jpg","imageUrl":""},
+  {"id":20173,"itemName":"F20","time":"1962年","location":"CERN","people":"-","description":"-","lat":46.2349649,"lng":6.0473162,"fileName":"F20.jpg","imageUrl":""},
+  {"id":20156,"itemName":"F03","time":"1963年","location":"Princeton","people":"-","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"F03.jpg","imageUrl":""},
+  {"id":20166,"itemName":"F13","time":"1963年11月","location":"Yeshiva 大學","people":"Rabi, 楊振寧, Lamb","description":"-","lat":40.8502619,"lng":-73.9288891,"fileName":"F13.jpg","imageUrl":""},
+  {"id":20167,"itemName":"F14","time":"1963年11月","location":"-","people":"陳省身, Rabi, Goldberger, 楊振寧","description":"-","lat":null,"lng":null,"fileName":"F14.jpg","imageUrl":""},
+  {"id":20159,"itemName":"F06","time":"1964年","location":"香港","people":"楊振漢, 楊振玉, 楊振寧, 楊羅孟華, 黃克孫, 黃伍美德, 黃月眉, 楊武之","description":"-","lat":22.3492155,"lng":114.1857978,"fileName":"F06.jpg","imageUrl":""},
+  {"id":20157,"itemName":"F04","time":"1966年春","location":"Princeton","people":"楊光宇, 楊振寧, 楊又禮","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"F04.jpg","imageUrl":""},
+  {"id":20162,"itemName":"F09","time":"1966年","location":"Princeton","people":"楊光宇, 楊光諾","description":"-","lat":40.3496953,"lng":-74.6597376,"fileName":"F09.jpg","imageUrl":""},
+  {"id":20169,"itemName":"F16","time":"1966年","location":"普林斯頓","people":"杜致禮, 楊振寧","description":"住宅院中","lat":40.3496953,"lng":-74.6597376,"fileName":"F16.jpg","imageUrl":""},
+  {"id":20170,"itemName":"F17","time":"1966年","location":"普林斯頓","people":"杜致禮, 楊又禮","description":"住宅院中","lat":40.3496953,"lng":-74.6597376,"fileName":"F17.jpg","imageUrl":""},
+  {"id":20176,"itemName":"G01","time":"1971年1月","location":"香港機場","people":"楊振平, 楊振漢","description":"-","lat":22.3161669,"lng":113.9365027,"fileName":"G01.jpg","imageUrl":""},
+  {"id":20186,"itemName":"G11","time":"1971年1月","location":"九龍","people":"-","description":"-","lat":22.3193039,"lng":114.1693611,"fileName":"G11.jpg","imageUrl":""},
+  {"id":20196,"itemName":"G20","time":"1971年夏","location":"中國","people":"杜聿明, 楊振漢, 楊振玉, 曹秀清, 楊振寧, 周恩來, 郭沫若, 劉西堯","description":"第一次訪問新中國","lat":39.91,"lng":116.38,"fileName":"G20.jpg","imageUrl":""},
+  {"id":20177,"itemName":"G02","time":"1971年8月4日","location":"南口長城","people":"-","description":"-","lat":40.8012631,"lng":115.544231,"fileName":"G02.jpg","imageUrl":""},
+  {"id":20179,"itemName":"G04","time":"1971年8月4日","location":"-","people":"周恩來, 楊振寧","description":"-","lat":null,"lng":null,"fileName":"G04.jpg","imageUrl":""},
+  {"id":20198,"itemName":"G22","time":"1971年","location":"北京大學","people":"楊振寧, 黃昆","description":"-","lat":39.9918215,"lng":116.3039468,"fileName":"G22.jpg","imageUrl":""},
+  {"id":20208,"itemName":"G32","time":"1971年","location":"頤和園","people":"楊振寧, 杜聿明夫婦","description":"-","lat":39.9900983,"lng":116.2647403,"fileName":"G32-S.jpg","imageUrl":""},
+  {"id":20185,"itemName":"G10","time":"1972年2月","location":"人民大會堂","people":"尼克松, 杜聿明","description":"碰杯","lat":39.9034621,"lng":116.3871486,"fileName":"G10.JPG","imageUrl":""},
+  {"id":20192,"itemName":"G16","time":"1972年7月","location":"上海華山醫院","people":"楊振寧, 楊武之","description":"-","lat":31.2178862,"lng":121.4383771,"fileName":"G16.jpg","imageUrl":""},
+  {"id":20199,"itemName":"G23","time":"1972年","location":"北京","people":"王承書, 張文裕, 楊振寧, 鄧稼先, 周光召","description":"-","lat":39.9057136,"lng":116.3912972,"fileName":"G23.jpg","imageUrl":""},
+  {"id":20180,"itemName":"G05","time":"1973年","location":"-","people":"毛澤東, 楊振寧","description":"-","lat":null,"lng":null,"fileName":"G05.jpg","imageUrl":""},
+  {"id":20182,"itemName":"G07","time":"1973年","location":"毛主席書房","people":"周恩來, 周培源, 毛澤東, 楊振寧","description":"-","lat":39.910,"lng":116.380,"fileName":"G07.jpg","imageUrl":""},
+  {"id":20191,"itemName":"G15","time":"1973年7月18日","location":"-","people":"鄧穎超, 杜致禮, 楊振寧, 周恩來, 張春橋","description":"-","lat":null,"lng":null,"fileName":"G15.jpg","imageUrl":""},
+  {"id":20205,"itemName":"G29","time":"1973年","location":"中山大學","people":"楊振寧, 姜立夫","description":"-","lat":23.0996034,"lng":113.2923509,"fileName":"G29-S.jpg","imageUrl":""},
+  {"id":20212,"itemName":"G36","time":"1973年","location":"-","people":"楊振寧, 周恩來","description":"-","lat":null,"lng":null,"fileName":"G36_With Premier Zhou_1973.jpg","imageUrl":""},
+  {"id":20200,"itemName":"G24","time":"1974年","location":"倫敦","people":"Harry Lam, 楊振寧","description":"-","lat":51.5074456,"lng":-0.1277653,"fileName":"G24.jpg","imageUrl":""},
+  {"id":20204,"itemName":"G28","time":"1974年","location":"天津","people":"杜聿明","description":"-","lat":39.3032619,"lng":117.4163641,"fileName":"G28-S.jpg","imageUrl":""},
+  {"id":20207,"itemName":"G31","time":"1974年","location":"美國","people":"-","description":"家","lat":40.914,"lng":-73.114,"fileName":"G31-S.jpg","imageUrl":""},
+  {"id":20195,"itemName":"G19","time":"1975年","location":"-","people":"楊振寧, 楊又禮","description":"漫畫","lat":null,"lng":null,"fileName":"G19.jpg","imageUrl":""},
+  {"id":20189,"itemName":"G14","time":"1976年4月15日","location":"中國","people":"熊向暉, 鄧穎超, 羅孟華, 楊振寧","description":"訪問中國","lat":39.91,"lng":116.38,"fileName":"G14.jpg","imageUrl":""},
+  {"id":20187,"itemName":"G12","time":"1976年感恩節","location":"-","people":"楊光宇, 杜致禮, 楊光諾, 楊又禮, 楊振寧","description":"-","lat":null,"lng":null,"fileName":"G12.jpg","imageUrl":""},
+  {"id":20202,"itemName":"G26","time":"1976年","location":"-","people":"-","description":"-","lat":null,"lng":null,"fileName":"G26-S.jpg","imageUrl":""},
+  {"id":20181,"itemName":"G06","time":"1977年夏","location":"上海錦江飯店","people":"胡和生, 忻元龍, 鄭紹廉, 孫鑫, 谷超豪, 嚴紹宗, 楊振寧, 沈純理, 夏道行, 李大潛","description":"-","lat":31.2215408,"lng":121.4567614,"fileName":"G06.jpg","imageUrl":""},
+  {"id":20193,"itemName":"G17","time":"1977年","location":"黃山","people":"周培源, 楊振寧","description":"-","lat":29.7172627,"lng":118.3324811,"fileName":"G17.jpg","imageUrl":""},
+  {"id":20201,"itemName":"G25","time":"1977年","location":"-","people":"Tomonaga","description":"-","lat":null,"lng":null,"fileName":"G25-S.jpg","imageUrl":""},
+  {"id":20206,"itemName":"G30","time":"1977年","location":"-","people":"楊振寧, 吳有訓","description":"-","lat":null,"lng":null,"fileName":"G30-S.jpg","imageUrl":""},
+  {"id":20209,"itemName":"G33","time":"1977-78年","location":"-","people":"-","description":"-","lat":null,"lng":null,"fileName":"G33.jpg","imageUrl":""},
+  {"id":20183,"itemName":"G08","time":"1978年","location":"北京","people":"杜聿明, 曹秀清","description":"-","lat":39.9057136,"lng":116.3912972,"fileName":"G08.jpg","imageUrl":""},
+  {"id":20197,"itemName":"G21","time":"1978年","location":"北京北海公園","people":"楊光宇, 楊振寧, 楊又禮","description":"-","lat":39.9264023,"lng":116.3824632,"fileName":"G21.jpg","imageUrl":""},
+  {"id":20203,"itemName":"G27","time":"1978年","location":"-","people":"-","description":"-","lat":null,"lng":null,"fileName":"G27-S.jpg","imageUrl":""},
+  {"id":20184,"itemName":"G09","time":"1979年1月30日","location":"華府 Hilton 旅館","people":"楊振寧, 何炳棣, 鄧小平","description":"-","lat":38.8950368,"lng":-77.0365427,"fileName":"G09.jpg","imageUrl":""},
+  {"id":20188,"itemName":"G13","time":"1979年1月30日","location":"華府 Hilton 旅館","people":"楊振寧, 杜致禮, 鄧小平","description":"-","lat":38.8950368,"lng":-77.0365427,"fileName":"G13.JPG","imageUrl":""},
+  {"id":20223,"itemName":"H11","time":"1980年初","location":"石溪","people":"王竹溪, 楊振寧","description":"-","lat":40.914,"lng":-73.114,"fileName":"H11.jpg","imageUrl":""},
+  {"id":20230,"itemName":"H18","time":"1980年代","location":"石溪辦公室","people":"-","description":"-","lat":40.914,"lng":-73.114,"fileName":"H18.jpg","imageUrl":""},
+  {"id":20246,"itemName":"H34","time":"1980年","location":"-","people":"楊振寧, 巴金","description":"-","lat":null,"lng":null,"fileName":"H34-S.jpg","imageUrl":""},
+  {"id":20232,"itemName":"H20","time":"1981年","location":"石溪","people":"-","description":"-","lat":40.914,"lng":-73.114,"fileName":"H20.jpg","imageUrl":""},
+  {"id":20213,"itemName":"H01","time":"1982年1月","location":"中文大學","people":"-","description":"-","lat":22.4201838,"lng":114.2079145,"fileName":"H01.jpg","imageUrl":""},
+  {"id":20219,"itemName":"H07","time":"1982年","location":"-","people":"吳大猷, 楊振寧","description":"60歲生日慶宴前","lat":null,"lng":null,"fileName":"H07.jpg","imageUrl":""},
+  {"id":20220,"itemName":"H08","time":"1982年","location":"-","people":"杜致禮, 楊振寧, 楊光諾, 楊又禮, 楊光宇","description":"60歲生日慶宴後","lat":null,"lng":null,"fileName":"H08.jpg","imageUrl":""},
+  {"id":20249,"itemName":"H37","time":"1982年12月19日","location":"大學站","people":"楊羅孟華, 楊振平","description":"-","lat":22.4124633,"lng":114.2111666,"fileName":"H37.jpg","imageUrl":""},
+  {"id":20229,"itemName":"H17","time":"1983年初","location":"北京","people":"黃昆, 楊振寧","description":"-","lat":39.9057136,"lng":116.3912972,"fileName":"H17.jpg","imageUrl":""},
+  {"id":20231,"itemName":"H19","time":"1983年12月28日","location":"-","people":"鄧小平, 楊振寧","description":"-","lat":null,"lng":null,"fileName":"H19.JPG","imageUrl":""},
+  {"id":20243,"itemName":"H31","time":"1983年","location":"日本日立實驗室","people":"楊振寧, 阿哈羅諾夫, 外村彰","description":"-","lat":36.9693645,"lng":140.0586007,"fileName":"H31.jpg","imageUrl":""},
+  {"id":20224,"itemName":"H12","time":"1984年夏","location":"Leiden","people":"吳大峻, 楊振寧","description":"-","lat":52.1594747,"lng":4.4908843,"fileName":"H12.jpg","imageUrl":""},
+  {"id":20217,"itemName":"H05","time":"1985年","location":"紐約州大學石溪分校","people":"張守廉, 陳省身, 楊振寧","description":"陳省身獲榮譽學位","lat":40.914,"lng":-73.114,"fileName":"H05.jpg","imageUrl":""},
+  {"id":20239,"itemName":"H27","time":"1985年","location":"CERN","people":"-","description":"-","lat":46.2349649,"lng":6.0473162,"fileName":"H27.jpg","imageUrl":""},
+  {"id":20221,"itemName":"H09","time":"1986年","location":"-","people":"雷根, 楊振寧","description":"授予美國國家科學獎","lat":null,"lng":null,"fileName":"H09.jpg","imageUrl":""},
+  {"id":20245,"itemName":"H33","time":"1986年5月","location":"北京","people":"楊振寧, Jack Steinberger","description":"-","lat":39.9057136,"lng":116.3912972,"fileName":"H33.jpg","imageUrl":""},
+  {"id":20215,"itemName":"H03","time":"1987年舊歷新年","location":"香港仔","people":"-","description":"-","lat":22.2489071,"lng":114.1564209,"fileName":"H03.jpg","imageUrl":""},
+  {"id":20238,"itemName":"H26","time":"1990年","location":"石溪","people":"Toll","description":"獲榮譽博士學位","lat":40.914,"lng":-73.114,"fileName":"H26.jpg","imageUrl":""},
+  {"id":20329,"itemName":"I79","time":"1990年代初","location":"香港中文大學","people":"楊振寧","description":"辦公室","lat":22.4201838,"lng":114.2079145,"fileName":"I79.jpg","imageUrl":""},
+  {"id":20254,"itemName":"I04","time":"1991年5月","location":"Ann Arbor","people":"楊振寧, 黃昆, 吳大猷","description":"-","lat":42.2813722,"lng":-83.7484616,"fileName":"I04.jpg","imageUrl":""},
+  {"id":20255,"itemName":"I05","time":"1992年7月","location":"台灣清華大學","people":"丘成桐, 楊振寧","description":"70歲生日慶祝會","lat":24.7916987,"lng":120.9924295,"fileName":"I05.jpg","imageUrl":""},
+  {"id":20263,"itemName":"I13","time":"1992年","location":"香港中文大學","people":"-","description":"70歲生日晚宴","lat":22.4201838,"lng":114.2079145,"fileName":"I13.jpg","imageUrl":""},
+  {"id":20309,"itemName":"I59","time":"1992年6月1日","location":"北京大學","people":"黃昆, 張守廉, 楊振寧","description":"周培源生日會","lat":39.9918215,"lng":116.3039468,"fileName":"I59.jpg","imageUrl":""},
+  {"id":20311,"itemName":"I61","time":"1992年","location":"台灣太魯閣","people":"楊振寧, 杜致禮","description":"-","lat":24.1521,"lng":121.623947,"fileName":"I61.jpg","imageUrl":""},
+  {"id":20252,"itemName":"I02","time":"1994年8月","location":"長城","people":"杜致禮, 楊振寧","description":"-","lat":40.8920544,"lng":114.4060305,"fileName":"I02.jpg","imageUrl":""},
+  {"id":20335,"itemName":"I85","time":"1994年8月22日","location":"北京","people":"于敏, 楊振寧","description":"-","lat":39.9057136,"lng":116.3912972,"fileName":"I85.jpg","imageUrl":""},
+  {"id":20264,"itemName":"I14","time":"1995年6月","location":"長江三峽","people":"杜致禮, 楊振寧","description":"-","lat":30.8261831,"lng":111.0075702,"fileName":"I14.jpg","imageUrl":""},
+  {"id":20266,"itemName":"I16","time":"1995年8月","location":"深圳世界之窗","people":"杜致禮, 楊振寧","description":"-","lat":22.5375058,"lng":113.9686115,"fileName":"I16.jpg","imageUrl":""},
+  {"id":20267,"itemName":"I17","time":"1995年8月","location":"漢城南大門","people":"杜致禮, 楊振寧","description":"-","lat":37.559992,"lng":126.9753556,"fileName":"I17.jpg","imageUrl":""},
+  {"id":20337,"itemName":"I87","time":"1995年","location":"汕頭","people":"翁帆, 杜致禮","description":"-","lat":23.3563921,"lng":116.6775856,"fileName":"I87.jpg","imageUrl":""},
+  {"id":20338,"itemName":"I88","time":"1995年","location":"汕頭","people":"翁帆, 楊振寧, 杜致禮","description":"-","lat":23.3563921,"lng":116.6775856,"fileName":"I88.jpg","imageUrl":""},
+  {"id":20343,"itemName":"I93","time":"1995年","location":"汕頭","people":"翁帆, 楊振寧","description":"-","lat":23.3563921,"lng":116.6775856,"fileName":"I93.jpg","imageUrl":""},
+  {"id":20275,"itemName":"I25","time":"1996年","location":"印度 Taj Mahal","people":"杜致禮, 楊振寧","description":"-","lat":27.1750075,"lng":78.0421013,"fileName":"I25.jpg","imageUrl":""},
+  {"id":20304,"itemName":"I54","time":"1997年1月","location":"香港浸會大學","people":"楊振寧, Lamb","description":"-","lat":22.337988,"lng":114.1826259,"fileName":"I54.jpg","imageUrl":""},
+  {"id":20332,"itemName":"I82","time":"1997年4月","location":"Washington D.C.","people":"杜致禮, 楊振寧, Lila Snow, George Snow","description":"-","lat":38.8950368,"lng":-77.0365427,"fileName":"I82.jpg","imageUrl":""},
+  {"id":20303,"itemName":"I53","time":"1997年9月","location":"漢城","people":"Faddeev, 楊振寧, Baxter","description":"-","lat":37.5666791,"lng":126.9782914,"fileName":"I53.jpg","imageUrl":""},
+  {"id":20314,"itemName":"I64","time":"1997年9月20日","location":"西湖","people":"楊振寧, 杜致禮","description":"遊西湖","lat":30.2459837,"lng":120.1431317,"fileName":"I64.jpg","imageUrl":""},
+  {"id":20344,"itemName":"I94","time":"1997年","location":"清華大學","people":"江澤民","description":"高等研究中心成立大會","lat":40.0022905,"lng":116.320963,"fileName":"I94.jpg","imageUrl":""},
+  {"id":20281,"itemName":"I31","time":"1998年5月20日","location":"中文大學","people":"李國章, 楊振寧, 何文匯","description":"榮譽理學博士學位典禮","lat":22.4201838,"lng":114.2079145,"fileName":"I31.jpg","imageUrl":""},
+  {"id":20268,"itemName":"I18","time":"1999年5月22日","location":"石溪","people":"楊振寧, Robert Mills","description":"-","lat":40.914,"lng":-73.114,"fileName":"I18.jpg","imageUrl":""},
+  {"id":20308,"itemName":"I58","time":"1999年","location":"北京清華大學","people":"-","description":"高等研究中心大樓","lat":40.0022905,"lng":116.320963,"fileName":"I58.jpg","imageUrl":""},
+  {"id":20290,"itemName":"I40","time":"2000年8月5日","location":"北戴河","people":"江澤民, 楊振寧","description":"-","lat":39.8605725,"lng":119.4354373,"fileName":"I40.jpg","imageUrl":""},
+  {"id":20294,"itemName":"I44","time":"2000年11月","location":"麗江","people":"杜致禮, 楊振寧","description":"-","lat":26.8595868,"lng":100.2249797,"fileName":"I44.jpg","imageUrl":""},
+  {"id":20295,"itemName":"I45","time":"2000年11月","location":"梵蒂岡","people":"楊振寧, Pope John Paul II","description":"-","lat":41.903411,"lng":12.4528527,"fileName":"I45.jpg","imageUrl":""},
+  {"id":20322,"itemName":"I72","time":"2000年4月","location":"雲南麗江","people":"楊振寧","description":"遠眺雲山","lat":26.8595868,"lng":100.2249797,"fileName":"I72.jpg","imageUrl":""},
+  {"id":20345,"itemName":"J01","time":"2001年2月16日","location":"Riyadh","people":"楊振寧","description":"頒獎典禮演講","lat":23.333333,"lng":45.333333,"fileName":"J01.jpg","imageUrl":""},
+  {"id":20347,"itemName":"J03","time":"2001年4月11日","location":"中文大學","people":"楊振寧, 李國章","description":"贈送獎章","lat":22.4201838,"lng":114.2079145,"fileName":"J03.jpg","imageUrl":""},
+  {"id":20348,"itemName":"J04","time":"2002年4月","location":"Montana","people":"楊振寧, 杜致禮","description":"-","lat":47.3752671,"lng":-109.638757,"fileName":"J04.JPG","imageUrl":""},
+  {"id":20349,"itemName":"J05","time":"2002年4月","location":"香港","people":"朱經武, 楊振寧","description":"-","lat":22.3492155,"lng":114.1857978,"fileName":"J05.JPG","imageUrl":""},
+  {"id":20352,"itemName":"J08","time":"2002年6月17日","location":"北京清華大學","people":"-","description":"80歲壽辰晚宴","lat":40.0022905,"lng":116.320963,"fileName":"J08.jpg","imageUrl":""},
+  {"id":20353,"itemName":"J09","time":"2002年6月","location":"北京清華大學","people":"Gell-Mann, 楊振寧","description":"-","lat":40.0022905,"lng":116.320963,"fileName":"J09.jpg","imageUrl":""},
+  {"id":20368,"itemName":"J24","time":"2003年11月23日","location":"北京","people":"楊振寧, 溫家寶","description":"-","lat":39.9057136,"lng":116.3912972,"fileName":"J24.jpg","imageUrl":""},
+  {"id":20376,"itemName":"J32","time":"2004年","location":"-","people":"楊振寧, 翁帆","description":"-","lat":null,"lng":null,"fileName":"J32.jpg","imageUrl":""},
+  {"id":20380,"itemName":"J36","time":"2005年8月","location":"北京","people":"Faddeev, 楊振寧, Niemi, 葛墨林","description":"-","lat":39.9057136,"lng":116.3912972,"fileName":"J36.jpg","imageUrl":""},
+  {"id":20392,"itemName":"J48","time":"2006年夏","location":"青海","people":"楊振寧, 翁帆","description":"-","lat":36.0,"lng":96.0,"fileName":"J48.jpg","imageUrl":""},
+  {"id":20394,"itemName":"J50","time":"2007年","location":"Tsinghua University","people":"-","description":"Science Hall","lat":40.0022905,"lng":116.320963,"fileName":"J50.JPG","imageUrl":""},
+  {"id":20404,"itemName":"J60","time":"2008年3月27-28日","location":"Stony Brook","people":"-","description":"Yang-Simons Symposium Poster","lat":40.908482,"lng":-73.1325471,"fileName":"J60.jpg","imageUrl":""},
+  {"id":20411,"itemName":"J67","time":"2009年3月","location":"-","people":"CNY, Koshiba","description":"-","lat":null,"lng":null,"fileName":"J67_Koshiba.JPG","imageUrl":""}
+];
+
+// =========================================================
+// 根據 fileName 生成正確的 imageUrl
+// =========================================================
+const IMAGE_BASE = 'https://dsprojects.lib.cuhk.edu.hk/wp-content/uploads/2026/05/';
+photoData.forEach(item => {
+    if (item.fileName) {
+        item.imageUrl = IMAGE_BASE + item.fileName;
+    }
+});
+
+// =========================================================
+// 構建 fileName → imageUrl 映射
+// =========================================================
+const fileUrlMap = {};
+photoData.forEach(item => {
+    if (item.fileName && item.imageUrl) {
+        fileUrlMap[item.fileName] = item.imageUrl;
+    }
+});
+
+// =========================================================
+// 數據處理
+// =========================================================
+function extractYear(timeStr) {
+    if (!timeStr || timeStr === '-') return null;
+    const match = timeStr.match(/(\d{4})/);
+    if (match) {
+        const y = parseInt(match[1], 10);
+        if (y >= 1900 && y <= 2025) return y;
+    }
+    if (timeStr.includes('个月')) return 1922;
+    return null;
+}
+
+function buildCaption(item) {
+    let parts = [];
+    if (item.time && item.time !== '-') parts.push(item.time);
+    if (item.people && item.people !== '-') parts.push(item.people);
+    if (item.description && item.description !== '-') parts.push(item.description);
+    return parts.join(' · ') || item.itemName;
+}
+
+function getCountry(lat, lng, locationName) {
+    if (locationName && locationName !== '-') {
+        if (/Montana|Princeton|Stony Brook|Ann Arbor|Rochester|Philadelphia|Niagara|White Sands|Wyoming|Washington|Chicago|芝加哥|普林斯頓|石溪|華府|紐約|舊金山|Yeshiva|美國/.test(locationName)) return '美國';
+        if (/Stockholm|斯得哥爾摩/.test(locationName)) return '瑞典';
+        if (/Geneva|日內瓦|CERN/.test(locationName)) return '瑞士';
+        if (/Leiden/.test(locationName)) return '荷蘭';
+        if (/London|倫敦/.test(locationName)) return '英國';
+        if (/Riyadh/.test(locationName)) return '沙特阿拉伯';
+        if (/梵蒂岡|Vatican/.test(locationName)) return '梵蒂岡';
+        if (/Kyoto|東京|日本|日立/.test(locationName)) return '日本';
+        if (/漢城|Seoul|南大門/.test(locationName)) return '韓國';
+        if (/Taj Mahal|印度/.test(locationName)) return '印度';
+        if (/澳洲|Australia/.test(locationName)) return '澳洲';
+        if (/台灣|太魯閣/.test(locationName)) return '台灣';
+        if (/香港|九龍|中文大學|浸會大學|大學站|香港仔|香港機場/.test(locationName)) return '香港';
+        if (/合肥|廈門|清華|北京|上海|昆明|雲南|漢口|天津|長城|黃山|深圳|汕頭|長江|西湖|麗江|北戴河|中山大學|南口|頤和園|人民大會堂|毛主席|中國|青海|Tsinghua|絨線胡同|龍院村|石林/.test(locationName)) return '中國';
+    }
+    if (lat === null || lng === null) return '';
+    if (lat >= 22.1 && lat <= 22.6 && lng >= 113.8 && lng <= 114.4) return '香港';
+    if (lat >= 21.5 && lat <= 25.5 && lng >= 119.5 && lng <= 122.5) return '台灣';
+    if (lat >= 30 && lat <= 46 && lng >= 129 && lng <= 146) return '日本';
+    if (lat >= 33 && lat <= 39 && lng >= 124 && lng <= 130) return '韓國';
+    if (lat >= 18 && lat <= 54 && lng >= 73 && lng <= 135) return '中國';
+    if (lat >= 24 && lat <= 50 && lng >= -125 && lng <= -66) return '美國';
+    if (lat >= 49 && lat <= 61 && lng >= -8 && lng <= 2) return '英國';
+    if (lat >= 55 && lat <= 70 && lng >= 11 && lng <= 25) return '瑞典';
+    if (lat >= 45.5 && lat <= 48 && lng >= 5.9 && lng <= 10.5) return '瑞士';
+    if (lat >= 50.5 && lat <= 53.8 && lng >= 3 && lng <= 7.5) return '荷蘭';
+    if (lat >= 6 && lat <= 36 && lng >= 68 && lng <= 98) return '印度';
+    if (lat >= 16 && lat <= 33 && lng >= 34 && lng <= 56) return '沙特阿拉伯';
+    if (lat >= 36 && lat <= 47 && lng >= 6.5 && lng <= 18.5) return '意大利';
+    if (lat >= -44 && lat <= -10 && lng >= 113 && lng <= 154) return '澳洲';
+    return '';
+}
+
+// 按坐標分組構建地點數據，存儲完整照片信息
+let locationMap = new Map();
+photoData.forEach(item => {
+    if (item.lat === null || item.lng === null) return;
+    const year = extractYear(item.time);
+    if (!year) return;
+
+    const key = `${item.lat.toFixed(3)},${item.lng.toFixed(3)}`;
+    const caption = buildCaption(item);
+    const country = getCountry(item.lat, item.lng, item.location);
+
+    if (!locationMap.has(key)) {
+        locationMap.set(key, {
+            name: item.location || '-',
+            lat: item.lat,
+            lng: item.lng,
+            country: country,
+            captions: [caption],
+            years: [year],
+            photoItems: [{ fileName: item.fileName, imageUrl: item.imageUrl, caption: caption }]
+        });
+    } else {
+        let loc = locationMap.get(key);
+        loc.captions.push(caption);
+        loc.years.push(year);
+        if (item.fileName) {
+            if (!loc.photoItems.find(p => p.fileName === item.fileName)) {
+                loc.photoItems.push({ fileName: item.fileName, imageUrl: item.imageUrl, caption: caption });
+            }
+        }
+        if (item.location && item.location !== '-' && item.location.length > loc.name.length) {
+            loc.name = item.location;
+        }
+        if (!loc.country && country) loc.country = country;
+    }
+});
+
+let journeyData = [];
+locationMap.forEach((value) => {
+    if (value.years.length === 0) return;
+    const minYear = Math.min(...value.years);
+    const maxYr = Math.max(...value.years);
+    journeyData.push({
+        name: value.name,
+        lat: value.lat,
+        lng: value.lng,
+        country: value.country || '',
+        year: minYear,
+        maxYear: maxYr,
+        captions: value.captions,
+        photoItems: value.photoItems,
+        location: value.name
+    });
+});
+
+journeyData.sort((a, b) => a.year - b.year);
+
+let minYear = journeyData.length ? Math.min(...journeyData.map(d => d.year)) : 1922;
+let maxYear = journeyData.length ? Math.max(...journeyData.map(d => d.maxYear || d.year)) : 2009;
+if (minYear > 1920) minYear = Math.min(minYear, 1922);
+if (maxYear < 2010) maxYear = Math.max(maxYear, 2009);
+
+// ========== 三維引擎 ==========
+let scene, camera, renderer, globe;
+const R = 5;
+let currentLang = 'zh';
+let currentYear = maxYear;
+let isDragging = false, prevMouse = { x: 0, y: 0 };
+let targetRotY = Math.PI * 0.75, targetRotX = 0.25;
+let currentRotY = targetRotY, currentRotX = targetRotX;
+let autoRotate = true, autoRotateTimer = null;
+let targetZoom = 13.5, currentZoom = 13.5;
+let markerMeshes = [], hitMeshes = [], ringMeshes = [];
+let flowSegments = [], totalPathLength = 0;
+let headMesh, headGlow, headPtLight, trailMeshes = [];
+let pathLineMesh = null;
+const TRAIL_COUNT = 25, SPEED = 1.8;
+
+function latLngToVec3(lat, lng, r) {
+    const phi = (90 - lat) * Math.PI / 180;
+    const theta = (lng + 180) * Math.PI / 180;
+    return new THREE.Vector3(-r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
+}
+
+function createArcPoints(lat1, lng1, lat2, lng2, r, segments) {
+    const v1 = latLngToVec3(lat1, lng1, r), v2 = latLngToVec3(lat2, lng2, r);
+    const angle = v1.angleTo(v2);
+    const pts = [];
+    for (let i = 0; i <= segments; i++) {
+        let t = i / segments;
+        if (Math.sin(angle) < 0.001) {
+            pts.push(v1.clone().lerp(v2, t));
+        } else {
+            const a = Math.sin((1 - t) * angle) / Math.sin(angle);
+            const b = Math.sin(t * angle) / Math.sin(angle);
+            pts.push(v1.clone().multiplyScalar(a).add(v2.clone().multiplyScalar(b)));
+        }
+        pts[pts.length - 1].normalize().multiplyScalar(r + Math.sin(t * Math.PI) * angle * r * 0.12);
+    }
+    return pts;
+}
+
+function getPointOnSegment(segment, distFromStart) {
+    const points = segment.points;
+    if (points.length === 0) return new THREE.Vector3();
+    if (distFromStart <= 0) return points[0].clone();
+    if (distFromStart >= segment.length) return points[points.length - 1].clone();
+    let accumulated = 0;
+    for (let i = 0; i < points.length - 1; i++) {
+        const p1 = points[i], p2 = points[i + 1];
+        const segLen = p1.distanceTo(p2);
+        if (distFromStart <= accumulated + segLen) {
+            return p1.clone().lerp(p2, (distFromStart - accumulated) / segLen);
+        }
+        accumulated += segLen;
+    }
+    return points[points.length - 1].clone();
+}
+
+function rebuildFlow() {
+    if (pathLineMesh) { globe.remove(pathLineMesh); pathLineMesh = null; }
+    if (headMesh) { globe.remove(headMesh); globe.remove(headGlow); globe.remove(headPtLight); headMesh = null; }
+    trailMeshes.forEach(m => globe.remove(m));
+    trailMeshes = [];
+    const filtered = journeyData.filter(d => d.year <= currentYear);
+    if (filtered.length < 2) { flowSegments = []; totalPathLength = 0; return; }
+    flowSegments = [];
+    totalPathLength = 0;
+    for (let i = 0; i < filtered.length - 1; i++) {
+        const pts = createArcPoints(filtered[i].lat, filtered[i].lng, filtered[i + 1].lat, filtered[i + 1].lng, R, 100);
+        let segLen = 0;
+        for (let j = 0; j < pts.length - 1; j++) segLen += pts[j].distanceTo(pts[j + 1]);
+        flowSegments.push({ points: pts, length: segLen, startDistance: totalPathLength });
+        totalPathLength += segLen;
+    }
+    const allPoints = [];
+    flowSegments.forEach(seg => {
+        if (allPoints.length === 0) allPoints.push(...seg.points);
+        else allPoints.push(...seg.points.slice(1));
+    });
+    if (allPoints.length > 1) {
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(allPoints);
+        pathLineMesh = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0x3a4a6a, transparent: true, opacity: 0.5 }));
+        globe.add(pathLineMesh);
+    }
+    headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.07, 20, 20), new THREE.MeshStandardMaterial({ color: 0xffdd99, emissive: 0xcc8844 }));
+    globe.add(headMesh);
+    headGlow = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffaa66, transparent: true, opacity: 0.3 }));
+    globe.add(headGlow);
+    headPtLight = new THREE.PointLight(0xffaa66, 0.7, 3);
+    globe.add(headPtLight);
+    for (let i = 0; i < TRAIL_COUNT; i++) {
+        const sz = 0.045 * (1 - i / TRAIL_COUNT);
+        const m = new THREE.Mesh(new THREE.SphereGeometry(Math.max(sz, 0.01), 8, 8), new THREE.MeshBasicMaterial({ color: 0xccaa77, transparent: true, opacity: 0.6 * (1 - i / TRAIL_COUNT) }));
+        trailMeshes.push(m);
+        globe.add(m);
+    }
+}
+
+function updateFlow(time) {
+    if (flowSegments.length === 0 || totalPathLength === 0 || !headMesh) return;
+    let distance = (time * 0.001 * SPEED) % totalPathLength;
+    let seg = null, distInSeg = 0;
+    for (let s of flowSegments) {
+        if (distance >= s.startDistance && distance <= s.startDistance + s.length) {
+            seg = s; distInSeg = distance - s.startDistance; break;
+        }
+    }
+    if (!seg) return;
+    const pos = getPointOnSegment(seg, distInSeg);
+    headMesh.position.copy(pos);
+    headGlow.position.copy(pos);
+    headPtLight.position.copy(pos);
+    for (let i = 0; i < TRAIL_COUNT; i++) {
+        let td = distance - (i + 1) * 0.35;
+        if (td < 0) td += totalPathLength;
+        let ts = null, tdi = 0;
+        for (let s of flowSegments) {
+            if (td >= s.startDistance && td <= s.startDistance + s.length) { ts = s; tdi = td - s.startDistance; break; }
+        }
+        if (ts) {
+            trailMeshes[i].position.copy(getPointOnSegment(ts, tdi));
+            trailMeshes[i].material.opacity = 0.5 * (1 - i / TRAIL_COUNT) * Math.min(1, (distance - td) / 1.5);
+        } else trailMeshes[i].material.opacity = 0;
+    }
+}
+
+function buildMarkers() {
+    journeyData.forEach((d, i) => {
+        const pos = latLngToVec3(d.lat, d.lng, R * 1.005);
+        const m = new THREE.Mesh(new THREE.SphereGeometry(0.028, 24, 24), new THREE.MeshStandardMaterial({ color: 0xe8d5a3, emissive: 0x332200, roughness: 0.3, metalness: 0.7 }));
+        m.position.copy(pos);
+        m.userData = { index: i };
+        globe.add(m);
+        markerMeshes.push(m);
+        const ring = new THREE.Mesh(new THREE.RingGeometry(0.038, 0.068, 32), new THREE.MeshBasicMaterial({ color: 0xd4b87a, transparent: true, opacity: 0.4, side: THREE.DoubleSide }));
+        ring.position.copy(pos);
+        ring.lookAt(pos.clone().multiplyScalar(2));
+        globe.add(ring);
+        ringMeshes.push(ring);
+        const h = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 8), new THREE.MeshBasicMaterial({ visible: false }));
+        h.position.copy(pos);
+        h.userData = { index: i };
+        globe.add(h);
+        hitMeshes.push(h);
+    });
+}
+
+function updateMarkersVisibility() {
+    markerMeshes.forEach((m, i) => {
+        const vis = journeyData[i].year <= currentYear;
+        m.visible = vis;
+        hitMeshes[i].visible = vis;
+        if (ringMeshes[i]) ringMeshes[i].visible = vis;
+    });
+}
+
+// =========================================================
+// 照片瀏覽（含翻頁）
+// =========================================================
+let currentPhotoPage = 0;
+let currentPhotoList = [];
+const PHOTOS_PER_PAGE = 3;
+
+function renderPhotoPage() {
+    const container = document.getElementById('photoContainer');
+    if (currentPhotoList.length === 0) {
+        container.innerHTML = '<div class="photo-empty"><svg class="photo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><div class="photo-text">歷史影像收錄中<br>Historical Archive</div></div>';
+        return;
+    }
+    const totalPages = Math.ceil(currentPhotoList.length / PHOTOS_PER_PAGE);
+    const start = currentPhotoPage * PHOTOS_PER_PAGE;
+    const pageItems = currentPhotoList.slice(start, start + PHOTOS_PER_PAGE);
+
+    let html = '<div class="photo-gallery">';
+    pageItems.forEach(p => {
+        html += `<div class="photo-item">
+            <img src="${p.imageUrl}" alt="${p.caption}" loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+            <div class="photo-error" style="display:none">⚠ 圖片載入失敗</div>
+            <div class="photo-caption">${p.caption}</div>
+        </div>`;
+    });
+    html += '</div>';
+
+    if (totalPages > 1) {
+        html += `<div class="photo-nav">
+            <button class="photo-nav-btn" onclick="prevPhotoPage()" ${currentPhotoPage === 0 ? 'disabled' : ''}>‹</button>
+            <span class="photo-counter">${currentPhotoPage + 1} / ${totalPages}（共 ${currentPhotoList.length} 張）</span>
+            <button class="photo-nav-btn" onclick="nextPhotoPage()" ${currentPhotoPage >= totalPages - 1 ? 'disabled' : ''}>›</button>
+        </div>`;
+    } else {
+        html += `<div class="photo-more">共 ${currentPhotoList.length} 張照片</div>`;
+    }
+    container.innerHTML = html;
+}
+
+function prevPhotoPage() {
+    if (currentPhotoPage > 0) { currentPhotoPage--; renderPhotoPage(); }
+}
+function nextPhotoPage() {
+    const totalPages = Math.ceil(currentPhotoList.length / PHOTOS_PER_PAGE);
+    if (currentPhotoPage < totalPages - 1) { currentPhotoPage++; renderPhotoPage(); }
+}
+
+function showInfo(d) {
+    const panel = document.getElementById('infoPanel');
+    document.getElementById('infoYear').textContent = d.location;
+    document.getElementById('infoLocation').textContent = d.country || '';
+    document.getElementById('infoLocationEn').textContent = d.year === d.maxYear ? `${d.year}年` : `${d.year}年 — ${d.maxYear}年`;
+    document.getElementById('infoTitle').textContent = currentLang === 'zh' ? '歷史影像' : 'Historical Photos';
+
+    const uniqueCaptions = [...new Set(d.captions)];
+    const descHtml = uniqueCaptions.map(c => `<div style="margin-bottom:4px">·  ${c}</div>`).join('');
+    document.getElementById('infoDesc').innerHTML = descHtml;
+
+    currentPhotoList = d.photoItems || [];
+    currentPhotoPage = 0;
+    renderPhotoPage();
+
+    panel.classList.add('active');
+}
+
+function closeInfo() { document.getElementById('infoPanel').classList.remove('active'); }
+
+function focusOnLocation(lat, lng) {
+    const v = latLngToVec3(lat, lng, R);
+    targetRotY = Math.atan2(-v.x, v.z);
+    targetRotX = Math.asin(Math.max(-1, Math.min(1, v.y / R))) * 0.6;
+    autoRotate = false;
+    clearTimeout(autoRotateTimer);
+    autoRotateTimer = setTimeout(() => { autoRotate = true; }, 5000);
+}
+
+function onCanvasClick(e) {
+    if (e.target.closest && e.target.closest('.info-panel')) return;
+    const rect = renderer.domElement.getBoundingClientRect();
+    const mouse = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+    );
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(hitMeshes.filter(h => h.visible));
+    if (hits.length) {
+        const idx = hits[0].object.userData.index;
+        showInfo(journeyData[idx]);
+        focusOnLocation(journeyData[idx].lat, journeyData[idx].lng);
+    }
+}
+
+function setupTimeline() {
+    const slider = document.getElementById('timelineSlider');
+    const label = document.getElementById('currentYearLabel');
+    slider.min = minYear;
+    slider.max = maxYear;
+    slider.value = maxYear;
+    label.textContent = maxYear;
+    document.getElementById('yearDisplay').textContent = minYear + ' → ' + maxYear;
+    function update() {
+        currentYear = parseInt(slider.value, 10);
+        label.textContent = currentYear;
+        document.getElementById('yearDisplay').textContent = minYear + ' → ' + currentYear;
+        updateMarkersVisibility();
+        rebuildFlow();
+    }
+    slider.addEventListener('input', update);
+    update();
+}
+
+function setLang(lang) {
+    currentLang = lang;
+    document.getElementById('btnZh').classList.toggle('active', lang === 'zh');
+    document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+    document.getElementById('titleZh').textContent = lang === 'zh' ? '楊振寧 — 人生之旅' : 'Yang Zhenning — Life Journey';
+    document.getElementById('instruction').textContent = lang === 'zh' ? '拖曳旋轉地球 · 點擊金色球體查看詳情 · 時間軸控制顯示範圍' : 'Drag to rotate · Click gold markers · Timeline controls range';
+    if (document.getElementById('infoPanel').classList.contains('active')) closeInfo();
+}
+
+function createRealisticEarth() {
+    const tl = new THREE.TextureLoader();
+    const earthMat = new THREE.MeshPhongMaterial({
+        map: tl.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
+        specularMap: tl.load('https://threejs.org/examples/textures/planets/earth_specular_2048.jpg'),
+        specular: new THREE.Color('grey'), shininess: 5,
+        normalMap: tl.load('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg'),
+        normalScale: new THREE.Vector2(0.8, 0.8)
+    });
+    globe.add(new THREE.Mesh(new THREE.SphereGeometry(R, 128, 128), earthMat));
+    const cloudMat = new THREE.MeshPhongMaterial({
+        map: tl.load('https://threejs.org/examples/textures/planets/earth_clouds_1024.png'),
+        transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending
+    });
+    globe.add(new THREE.Mesh(new THREE.SphereGeometry(R + 0.02, 128, 128), cloudMat));
+}
+
+function init() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, currentZoom);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x060914);
+    document.getElementById('scene-container').appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0x334455, 0.7));
+    const dLight = new THREE.DirectionalLight(0x88aacc, 0.5);
+    dLight.position.set(5, 3, 5);
+    scene.add(dLight);
+    scene.add(new THREE.DirectionalLight(0x446688, 0.3).translateX(-3).translateY(-1).translateZ(-4));
+
+    globe = new THREE.Group();
+    scene.add(globe);
+
+    const starsGeo = new THREE.BufferGeometry();
+    const starsPos = [];
+    for (let i = 0; i < 3500; i++) starsPos.push((Math.random() - 0.5) * 300, (Math.random() - 0.5) * 300, (Math.random() - 0.5) * 300);
+    starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starsPos, 3));
+    scene.add(new THREE.Points(starsGeo, new THREE.PointsMaterial({ color: 0x888888, size: 0.12, transparent: true, opacity: 0.6 })));
+
+    createRealisticEarth();
+
+    const atmosMat = new THREE.ShaderMaterial({
+        vertexShader: `varying vec3 vNormal;void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+        fragmentShader: `varying vec3 vNormal;void main(){float i=pow(0.62-dot(vNormal,vec3(0,0,1)),2.0);gl_FragColor=vec4(0.25,0.45,0.75,1.0)*i*0.5;}`,
+        blending: THREE.AdditiveBlending, side: THREE.BackSide, transparent: true
+    });
+    globe.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.12, 64, 64), atmosMat));
+
+    buildMarkers();
+    setupTimeline();
+
+    const cvs = renderer.domElement;
+    let dragMoved = false;
+
+    cvs.addEventListener('mousedown', e => {
+        isDragging = true; dragMoved = false;
+        prevMouse = { x: e.clientX, y: e.clientY };
+        autoRotate = false; clearTimeout(autoRotateTimer);
+    });
+    window.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
+        if (Math.abs(dx) + Math.abs(dy) > 3) dragMoved = true;
+        targetRotY += dx * 0.004;
+        targetRotX += dy * 0.004;
+        targetRotX = Math.max(-1.2, Math.min(1.2, targetRotX));
+        prevMouse = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+        autoRotateTimer = setTimeout(() => { autoRotate = true; }, 3000);
+    });
+    cvs.addEventListener('click', e => { if (!dragMoved) onCanvasClick(e); });
+    cvs.addEventListener('wheel', e => {
+        targetZoom += e.deltaY * 0.008;
+        targetZoom = Math.max(8, Math.min(22, targetZoom));
+        e.preventDefault();
+    }, { passive: false });
+
+    let touchStartDist = 0;
+    cvs.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) {
+            isDragging = true; dragMoved = false;
+            prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            autoRotate = false; clearTimeout(autoRotateTimer);
+        } else if (e.touches.length === 2) {
+            touchStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        }
+    }, { passive: true });
+    cvs.addEventListener('touchmove', e => {
+        if (e.touches.length === 1 && isDragging) {
+            const dx = e.touches[0].clientX - prevMouse.x, dy = e.touches[0].clientY - prevMouse.y;
+            if (Math.abs(dx) + Math.abs(dy) > 3) dragMoved = true;
+            targetRotY += dx * 0.004;
+            targetRotX += dy * 0.004;
+            targetRotX = Math.max(-1.2, Math.min(1.2, targetRotX));
+            prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        } else if (e.touches.length === 2) {
+            const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            targetZoom += (touchStartDist - dist) * 0.02;
+            targetZoom = Math.max(8, Math.min(22, targetZoom));
+            touchStartDist = dist;
+        }
+        e.preventDefault();
+    }, { passive: false });
+    cvs.addEventListener('touchend', e => {
+        if (e.touches.length === 0) {
+            if (!dragMoved && prevMouse.x) {
+                onCanvasClick({ clientX: prevMouse.x, clientY: prevMouse.y });
+            }
+            isDragging = false;
+            autoRotateTimer = setTimeout(() => { autoRotate = true; }, 3000);
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    function animate(time) {
+        requestAnimationFrame(animate);
+        if (autoRotate) targetRotY += 0.0008;
+        currentRotY += (targetRotY - currentRotY) * 0.06;
+        currentRotX += (targetRotX - currentRotX) * 0.06;
+        currentZoom += (targetZoom - currentZoom) * 0.08;
+        globe.rotation.y = currentRotY;
+        globe.rotation.x = currentRotX;
+        camera.position.z = currentZoom;
+        markerMeshes.forEach((m, i) => {
+            if (m.visible) {
+                m.scale.setScalar(0.85 + 0.2 * (0.6 + 0.4 * Math.sin(time * 0.0025 + i * 0.8)));
+                m.material.emissiveIntensity = 0.2 + 0.15 * Math.sin(time * 0.003);
+            }
+        });
+        updateFlow(time);
+        renderer.render(scene, camera);
+    }
+    animate(0);
+}
+init();
+
+console.log(`✅ 已載入 ${photoData.length} 條照片數據`);
+console.log(`✅ 已生成 ${journeyData.length} 個地球標記點`);
+</script>
+</body>
+</html>

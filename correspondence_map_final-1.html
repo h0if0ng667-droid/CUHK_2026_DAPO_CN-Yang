@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>楊振寧學術通信</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0c1420;overflow:hidden;font-family:'Inter','Noto Sans SC',sans-serif;color:#c0cfe0}
+#container{position:fixed;inset:0}
+#vignette{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,0.6)100%)}
+#title-bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:20;text-align:center;pointer-events:none}
+#title-bar h1{font-family:'Noto Serif SC',serif;font-weight:600;font-size:15px;color:#dce8f5;letter-spacing:2px;text-shadow:0 0 20px rgba(100,160,255,0.25)}
+#title-bar .sub{font-size:10.5px;opacity:.35;margin-top:2px;letter-spacing:1px}
+#panels{position:fixed;top:50px;left:12px;display:flex;flex-direction:column;gap:5px;max-height:calc(100vh - 64px);overflow-y:auto;z-index:20;scrollbar-width:none;pointer-events:none}
+#panels::-webkit-scrollbar{display:none}
+.pnl{pointer-events:auto;width:232px;background:rgba(6,12,28,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(60,120,200,0.13);border-radius:7px;box-shadow:0 4px 24px rgba(0,0,0,0.45);font-size:11.5px;overflow:hidden;transition:border-color .3s}
+.pnl:hover{border-color:rgba(60,120,200,0.28)}
+.ph{padding:9px 13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;font-weight:500;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;opacity:.75;transition:opacity .2s}
+.ph:hover{opacity:1}
+.ph .arr{transition:transform .3s;font-size:8px;opacity:.4}
+.ph.c .arr{transform:rotate(-90deg)}
+.pb{overflow:hidden;max-height:500px;transition:max-height .35s ease,padding .3s,opacity .25s;opacity:1;padding:2px 13px 10px}
+.pb.c{max-height:0!important;padding:0 13px;opacity:0}
+.sr{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(60,120,200,0.05)}.sr:last-child{border:none}
+.sl{opacity:.5;font-size:10.5px}.sv{font-weight:600;color:#7cb8ff;font-size:12.5px;font-variant-numeric:tabular-nums}
+.fr{margin:5px 0}.fr label{display:block;font-size:9.5px;opacity:.4;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
+.fr input[type=range]{width:100%;accent-color:#4a8eff;cursor:pointer;height:3px}
+.yd{text-align:center;font-size:14px;font-weight:600;color:#7cb8ff;margin:2px 0 7px;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.li{display:flex;align-items:center;padding:2.5px 0;font-size:10.5px;opacity:.7}
+.lc{width:18px;height:2px;border-radius:1px;margin-right:7px;flex-shrink:0}
+#lang{position:fixed;top:14px;right:12px;display:flex;background:rgba(6,12,28,0.92);backdrop-filter:blur(18px);border:1px solid rgba(60,120,200,0.13);border-radius:5px;overflow:hidden;z-index:20;font-size:11px}
+#lang button{background:none;border:none;color:#5577aa;padding:6px 13px;cursor:pointer;transition:all .25s;font-family:inherit;font-size:11px;letter-spacing:.3px}
+#lang button.a{background:rgba(60,120,200,0.18);color:#7cb8ff}
+#lang button:hover{color:#a0c8ee}
+#det{position:fixed;top:0;right:0;width:330px;height:100%;background:rgba(6,12,28,0.97);backdrop-filter:blur(24px);border-left:1px solid rgba(60,120,200,0.13);z-index:30;transform:translateX(100%);transition:transform .35s ease;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#1a3050 transparent}
+#det.open{transform:translateX(0)}
+#det::-webkit-scrollbar{width:5px}#det::-webkit-scrollbar-track{background:transparent}#det::-webkit-scrollbar-thumb{background:#1a3050;border-radius:3px}
+.dh{position:sticky;top:0;background:rgba(6,12,28,0.97);padding:12px 14px;border-bottom:1px solid rgba(60,120,200,0.08);cursor:pointer;display:flex;justify-content:space-between;align-items:center;z-index:1}
+.dh:hover .dx{opacity:1}
+.dn{font-family:'Noto Serif SC',serif;font-size:14px;font-weight:600;color:#dce8f5;line-height:1.4}
+.dc{font-size:10.5px;opacity:.45;margin-top:2px}
+.dk{font-size:11px;color:#7cb8ff;margin-top:3px}
+.dx{font-size:16px;opacity:.4;transition:opacity .2s}
+#dl{padding:10px 14px}
+.di{padding:7px 0;border-bottom:1px solid rgba(60,120,200,0.05);font-size:11px;line-height:1.55}
+.di:last-child{border:none}
+.dp{color:#7cb8ff;font-weight:500}.dy{font-size:9.5px;opacity:.35;margin-left:3px}
+.dt{opacity:.6;margin-top:1px}
+#bot{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(6,12,28,0.65);backdrop-filter:blur(10px);border:1px solid rgba(60,120,200,0.08);border-radius:5px;padding:5px 14px;font-size:10px;opacity:.4;white-space:nowrap;z-index:20;pointer-events:none;letter-spacing:.3px}
+#tip{position:fixed;pointer-events:none;background:rgba(6,12,28,0.95);backdrop-filter:blur(14px);border:1px solid rgba(60,120,200,0.22);border-radius:5px;padding:7px 11px;font-size:11px;z-index:100;display:none;max-width:220px;box-shadow:0 4px 20px rgba(0,0,0,0.55)}
+.tn{font-weight:500;color:#7cb8ff;margin-bottom:1px;font-size:11.5px}.ti{opacity:.45;font-size:10px}
+#ld{position:fixed;inset:0;background:#020408;display:flex;align-items:center;justify-content:center;z-index:1000;transition:opacity 1s}
+#ld.h{opacity:0;pointer-events:none}
+#ld span{font-size:12px;opacity:.4;letter-spacing:3px;text-transform:uppercase;animation:pu 1.5s infinite}
+@keyframes pu{0%,100%{opacity:.25}50%{opacity:.6}}
+.country-label{color:rgba(220,230,255,0.9);font-size:16px;font-weight:500;text-shadow:0 0 15px #2277ff,0 1px 3px black;white-space:nowrap;background:rgba(10,20,40,0.5);padding:2px 8px;border-radius:12px;border:1px solid rgba(100,160,255,0.3);backdrop-filter:blur(4px);pointer-events:none;transition:opacity 0.2s}
+@media(max-width:768px){.pnl{width:190px;font-size:10.5px}#det{width:260px}#title-bar h1{font-size:13px}}
+</style>
+</head>
+<body>
+<div id="ld"><span data-i18n="loading">載入中</span></div>
+<div id="container"></div>
+<div id="vignette"></div>
+<div id="title-bar"><h1 data-i18n="title">楊振寧學術通信</h1><div class="sub">1951 – 1993</div></div>
+<div id="panels">
+<div class="pnl"><div class="ph" onclick="tp(this)"><span data-i18n="sT">統計摘要</span><span class="arr">▼</span></div><div class="pb">
+<div class="sr"><span class="sl" data-i18n="lo">地點總數</span><span class="sv" id="vl">0</span></div>
+<div class="sr"><span class="sl" data-i18n="en">通信條目</span><span class="sv" id="ve">0</span></div>
+<div class="sr"><span class="sl" data-i18n="co">活躍連線</span><span class="sv" id="vc">0</span></div>
+<div class="sr"><span class="sl" data-i18n="yr">年份範圍</span><span class="sv" id="vy">1951–1993</span></div>
+</div></div>
+<div class="pnl"><div class="ph" onclick="tp(this)"><span data-i18n="fT">年份篩選</span><span class="arr">▼</span></div><div class="pb">
+<div class="yd"><span id="ys">1951</span> — <span id="ye">1993</span></div>
+<div class="fr"><label data-i18n="sy">起始年</label><input type="range" id="rs" min="1951" max="1993" value="1951" oninput="oF()"></div>
+<div class="fr"><label data-i18n="ey">結束年</label><input type="range" id="re" min="1951" max="1993" value="1993" oninput="oF()"></div>
+</div></div>
+<div class="pnl"><div class="ph" onclick="tp(this)"><span data-i18n="lT">國家圖例</span><span class="arr">▼</span></div><div class="pb" id="lgb"></div></div>
+</div>
+<div id="lang"><button class="a" onclick="sL('zh')">繁中</button><button onclick="sL('en')">EN</button></div>
+<div id="det"><div class="dh" onclick="cD()"><div><div class="dn" id="ddn"></div><div class="dc" id="ddc"></div><div class="dk" id="ddk"></div></div><span class="dx">✕</span></div><div id="dl"></div></div>
+<div id="bot"><span data-i18n="bt">亮度 = 通信數量 · 流光連線動態更新</span></div>
+<div id="tip"><div class="tn" id="ttn"></div><div class="ti" id="tti"></div></div>
+
+<script>
+/* ============================================================
+   DATA — unchanged
+   ============================================================ */
+const LOCS = [
+  {
+    "name": "National Research Council of Canada",
+    "lat": 43.0158,
+    "lon": -81.2781,
+    "country": "Canada",
+    "count": 2,
+    "desc": [
+      "Wu Ta-You - 2le, about a talk about the meaning of parity conservation in general; a thanks letter to Wu for initiated Yang into the field of symmetry laws and group theory in the spring of 1942 (1957)",
+      "Ta-You Wu - 1photo, about 吳大猷回信. (1957年) (1957)"
+    ]
+  },
+  {
+    "name": "National Research Council of Canada, Ottawa",
+    "lat": 61.0667,
+    "lon": -107.9917,
+    "country": "Canada",
+    "count": 1,
+    "desc": [
+      "Ta-You Wu - 1photo, about 致吳大猷的信. (1957年) (1957)"
+    ]
+  },
+  {
+    "name": "Chinese Academy of Sciences",
+    "lat": 39.9093,
+    "lon": 116.3297,
+    "country": "China",
+    "count": 1,
+    "desc": [
+      "Yang Guang-han - 1le, about C<Sub>60</Sub>; C<Sub>72</Sub> (1991)"
+    ]
+  },
+  {
+    "name": "Chinese Academy of Sciences or affiliated Chinese research institution / Institute of Theoretical Physics, Chinese Academy of Sciences",
+    "lat": 35.0001,
+    "lon": 104.9999,
+    "country": "China",
+    "count": 2,
+    "desc": [
+      "Bing-Ming Xiong - 1le, about 對稱 (1986)",
+      "Yue Fan Deng - 11le, about non-degenerate zero eigenvector problem; degeneracy problem; corrected item A; result of F and G; p = +1; changing alpha problem;\n bitnet (A); great complications for the 5+ (1992)"
+    ]
+  },
+  {
+    "name": "Chinese institution (possibly Peking University or a mainland Chinese research institute)",
+    "lat": 39.99,
+    "lon": 116.31,
+    "country": "China",
+    "count": 1,
+    "desc": [
+      "Mingguang Feng - ns 27p hw, about Gu-Yang papers; Fermion lattice gas; 馮明光89年3月2日之信件 (1989)"
+    ]
+  },
+  {
+    "name": "CEA Saclay (Commissariat à l'énergie atomique, Saclay)",
+    "lat": 48.729,
+    "lon": 2.1457,
+    "country": "France",
+    "count": 1,
+    "desc": [
+      "E Brezin - 1le, about One dimensional delta force; results in the case of scattering asymptotic conditions (1967)"
+    ]
+  },
+  {
+    "name": "Centre d'Etudes Nucléaires de Saclay / Laboratoire de l'Accélérateur Linéaire, Orsay",
+    "lat": 46.6034,
+    "lon": 1.8883,
+    "country": "France",
+    "count": 7,
+    "desc": [
+      "L Behr - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "J Lowys - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "L Chounet - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "B Aubert - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "P Mittner - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "F Canavan - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "C Pascaud - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)"
+    ]
+  },
+  {
+    "name": "University of Cologne (Universität zu Köln)",
+    "lat": 50.928,
+    "lon": 6.9281,
+    "country": "Germany",
+    "count": 1,
+    "desc": [
+      "Friedrich W Hehl - 1le, 1pp, about Stephenson-Kilmister-Yang gravitational theory; Vacuum Solutions with Double Duality Properties of a Quadratic Poincaré Gauge Field Theory (1980)"
+    ]
+  },
+  {
+    "name": "University of Hamburg",
+    "lat": 53.5641,
+    "lon": 9.995,
+    "country": "Germany",
+    "count": 1,
+    "desc": [
+      "Gunther Lutjens - 1le, about Results of a partial wave analysis of the dipion coming form reactions π + N → π<sup>+</sup> + π<sup>–</sup> + N (1964)"
+    ]
+  },
+  {
+    "name": "Tata Institute of Fundamental Research (TIFR), Bombay / Tata Institute of Fundamental Research, Bombay / Tata Institute of Fundamental Research, Mumbai",
+    "lat": 18.9071,
+    "lon": 72.805,
+    "country": "India",
+    "count": 5,
+    "desc": [
+      "G Rajasekharan - 1le, about Mass formula for the 10-fold P<sub>3/2</sub> resonances in unitary symmetry (1963)",
+      "G Rajasekharan - 3le, about Resonances in unitary symmetry; meson-baryon resonances; SU<sub>3</sub> multiplets; pole of the S-matrix (1963)",
+      "Patil - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "Shasanka M Roy - 2le (ic 1cp), about Aharonov-Bohm effect. (1979)",
+      "B Sriram Shastry - 2le, about thanks letter; preprints; Bethe wavefunction; μ pairing (1990)"
+    ]
+  },
+  {
+    "name": "Hebrew University of Jerusalem",
+    "lat": 31.7919,
+    "lon": 35.2447,
+    "country": "Israel",
+    "count": 1,
+    "desc": [
+      "M Kugler - 3le, about Anandan's calculations; Lorentz transormations; Invariants and classification of Yang-Mills fields; N*N symmetric matrix; spinor method (1977)"
+    ]
+  },
+  {
+    "name": "Istituto Superiore di Sanità, Rome",
+    "lat": 41.9052,
+    "lon": 12.5202,
+    "country": "Italy",
+    "count": 1,
+    "desc": [
+      "Mario Ageno - 1le, ns 8p hw xc, about CN Yang's lecture notes; International School of Subnuclear Physics; general rules of the calculus of exterior form (1976)"
+    ]
+  },
+  {
+    "name": "University of Milan (Università degli Studi di Milano, likely emeritus)",
+    "lat": 45.4757,
+    "lon": 9.2283,
+    "country": "Italy",
+    "count": 1,
+    "desc": [
+      "G Occhialini - 3le, about write about CY Chao (1984)"
+    ]
+  },
+  {
+    "name": "University of Padova / INFN Sezione di Padova",
+    "lat": 42.6384,
+    "lon": 12.6743,
+    "country": "Italy",
+    "count": 7,
+    "desc": [
+      "S Ciampolillo - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "H Huzita - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "E Calimani - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "G Miari - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "M Baldo-Ceolin - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "F Mattioli - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "C Fillippi-Filosofo - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)"
+    ]
+  },
+  {
+    "name": "Hitachi Advanced Research Laboratory, Hatoyama, Saitama, Japan",
+    "lat": 36.5748,
+    "lon": 139.2394,
+    "country": "Japan",
+    "count": 1,
+    "desc": [
+      "Akira Tonomura - 1le, ns 11p hw, about Pinned flux bundles; method of image; H Field of Tonomura (1990)"
+    ]
+  },
+  {
+    "name": "Nagoya University",
+    "lat": 35.1533,
+    "lon": 136.9678,
+    "country": "Japan",
+    "count": 1,
+    "desc": [
+      "Satio Hayakawa - 1le, about Recollections of Occhialini, by S Hayakawa; Veppo Occhialini's comment on Chao's work (1985)"
+    ]
+  },
+  {
+    "name": "Kamerlingh Onnes Laboratory, Leiden University",
+    "lat": 52.2435,
+    "lon": 5.6343,
+    "country": "Netherlands",
+    "count": 1,
+    "desc": [
+      "Rudolf de Bruyn Ouboter - 11le hw xc, ns 1p hw, about calculations on the thermodynamic properties of liquid <sup>3</sup>He – <sup>4</sup>He mixtures in the limit of zero temperature, in the pressure range between 0 and 20 atm (1984)"
+    ]
+  },
+  {
+    "name": "University of Wrocław, Institute of Theoretical Physics, Poland",
+    "lat": 52.2159,
+    "lon": 19.1344,
+    "country": "Poland",
+    "count": 1,
+    "desc": [
+      "Jan Mozrzymas - 1le hw, about references on the space group (1982)"
+    ]
+  },
+  {
+    "name": "Stockholm University",
+    "lat": 59.3661,
+    "lon": 18.0596,
+    "country": "Sweden",
+    "count": 1,
+    "desc": [
+      "Gosta Ekspong - 2le, about Stranathan's book; professor Chao (1986)"
+    ]
+  },
+  {
+    "name": "ETH Zürich (Swiss Federal Institute of Technology)",
+    "lat": 47.4132,
+    "lon": 8.5375,
+    "country": "Switzerland",
+    "count": 1,
+    "desc": [
+      "Wolfgang Pauli - 5le(ic 3cp), about Pauli's equation (1954)"
+    ]
+  },
+  {
+    "name": "Academia Sinica, Taiwan",
+    "lat": 25.0421,
+    "lon": 121.614,
+    "country": "Taiwan",
+    "count": 2,
+    "desc": [
+      "Ta-You Wu - 1photo, about 1989年吳大猷回CN Yang信函. (1989)",
+      "Ta-You Wu - 1photo, about 1989年CN Yang致吳大猷信函. (1989)"
+    ]
+  },
+  {
+    "name": "Queen Elizabeth College, University of London / Rutherford High Energy Laboratory (RHEL), UK",
+    "lat": 54.7024,
+    "lon": -3.2766,
+    "country": "United Kingdom",
+    "count": 4,
+    "desc": [
+      "Geoff Manning - 4le, about Phase angel of ε; C-P violation; K<sub>L</sub><sup>0</sup> → 2π<sup>0</sup> paper (1966)",
+      "Geoff Manning - 1le, about the article of CP violation by Byers, MacDowell & Yang (1966)",
+      "Geoff Manning - 1le, about the article of Barrett and Truong (PRL, 17, 880); The charge asymmetry of the Dalitz plot (1967)",
+      "WB Bonnor - 1le, about references of non-radiative motions in electromagnetism (1980)"
+    ]
+  },
+  {
+    "name": "University of Oxford",
+    "lat": 51.7525,
+    "lon": -1.2143,
+    "country": "United Kingdom",
+    "count": 1,
+    "desc": [
+      "Nina Byers - ns 5p hw, 2le, about Cylinder case; London equation; Axial symmetry; Derivation of Yang's equation (3); Letters of CN Yang, Nina, Deaver and Fairbank; Solutions to Bogolubov's integral equation; Glashow' calculation and experiment (1961)"
+    ]
+  },
+  {
+    "name": "American Physical Society / American Physical Society (Physical Review Editorial Office)",
+    "lat": 40.8774,
+    "lon": -72.8952,
+    "country": "United States",
+    "count": 3,
+    "desc": [
+      "S Pasternack - 1le, about Publication of \"The Spontaneous Magnetization of a Two-Dimensional Ising Model\"; Physical Review (1951)",
+      "George Trigg - 4le, about Phase angel of ε; C-P violation; K<sub>L</sub><sup>0</sup> → 2π<sup>0</sup> paper (1966)",
+      "George Trigg - 1le(ic 1pp), about submitting paper; Possible Quantum Number Assignment for J and ψ (3695) (1974)"
+    ]
+  },
+  {
+    "name": "Bartol Research Institute, University of Delaware / C.N. Yang Institute for Theoretical Physics, Stony Brook University (SUNY Stony Brook) / Lawrence Radiation Laboratory, Berkeley / SUNY Stony Brook / Springer-Verlag New York / Stanford Linear Accelerator Center (SLAC) / Stanford University / University of California, Berkeley / Lawrence Radiation Laboratory / University of Illinois at Urbana-Champaign / University of Texas at Austin, Center for Relativity / University of Texas at Austin, Institute for Fusion Studies / Unknown — possibly a US university or national laboratory (e.g., Argonne National Laboratory or University of Illinois) / W.H. Freeman and Company / W.H. Freeman and Company or SUNY Stony Brook (administrative staff)",
+    "lat": 39.7837,
+    "lon": -100.4459,
+    "country": "United States",
+    "count": 77,
+    "desc": [
+      "Richard Christian - 1le, about Formulation of the (Κ<sup>-</sup>ρ) problem (1961)",
+      "SM Berman - 3le, about Test run photon problem at M<sub>w</sub> = 800 Mev, photon energy = 10 Bev, with a new set of form factors given by Hand-Miller-Wilson; Neutron form factors; Fuchel's result (1963)",
+      "P Eberhard - 1le, about The sign of β for the Λ decay (1965)",
+      "Frank S Crawford Jr. - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "CN Yang - 4le, about Phase angel of ε; C-P violation; K<sub>L</sub><sup>0</sup> → 2π<sup>0</sup> paper (1966)",
+      "CN Yang - 1le, about the asymmetry in the range 560 > m > 540; intrinsically greater errors in momenta measurement (1966)",
+      "CN Yang - 1le, about the article of CP violation by Byers, MacDowell & Yang (1966)",
+      "CN Yang - 1le, about Physical picture of Hereford's experiment; Phenomenological analysis of the experiment (1966)",
+      "CN Yang - 1le, about One dimensional delta force; results in the case of scattering asymptotic conditions (1967)",
+      "CN Yang - 1le, about the process K<sub>L</sub> → π<sup>0</sup>e<sup>–</sup> e<sup>+</sup> is forbidden for one photon exchange diagram if all interactions CP is conserved (1967)",
+      "CN Yang - 1le, about the article of Barrett and Truong (PRL, 17, 880); The charge asymmetry of the Dalitz plot (1967)",
+      "CN Yang - 2le, about Incoherent source of K<sub>S</sub> and K<sub>L</sub>; CP violation (1973)",
+      "CN Yang - 2le, ns 1p hw xc, about Braid group; Notes on W W Boone and Haken (1973)",
+      "WW Boone - 2le, ns 1p hw xc, about Braid group; Notes on W W Boone and Haken (1973)",
+      "CN Yang - 1le(ic 1pp), about submitting paper; Possible Quantum Number Assignment for J and ψ (3695) (1974)",
+      "CN Yang - 4le, ns 23p hw, about Parallel displacement gauge field; [Φ, Φ] = 0 (1974)",
+      "HT Nieh - 1le(ic 1pp), about submitting paper; Possible Quantum Number Assignment for J and ψ (3695) (1974)",
+      "CN Yang - 1le, about CN Yang's note, Speculations on Associated Production of J and Existence of Hypothetical Baryon circle H (1975)",
+      "CN Yang - 1le, about the paper of \"Possible Interactions of the J-particle\" (1975)",
+      "Yoichi Kazama - 3le, ns 5p hw, about Cronin phenomena could be explained as a multiple and inelastic scattering phenomena (1975)",
+      "CN Yang - 3le, ns 5p hw, about Cronin phenomena could be explained as a multiple and inelastic scattering phenomena (1975)",
+      "Tom K Gaisser - 1le, about CN Yang's note, Speculations on Associated Production of J and Existence of Hypothetical Baryon circle H (1975)",
+      "CN Yang - 1le, ns 8p hw xc, about CN Yang's lecture notes; International School of Subnuclear Physics; general rules of the calculus of exterior form (1976)",
+      "Alfred Schild - 1le, about Relevant early papers by H Weyl (1977)",
+      "CN Yang - 1le, 1p idx on folder, about SO<sub>4</sub> symmetrical SO<sub>3</sub> gauge fields (1977)",
+      "CN Yang - 3le, about Anandan's calculations; Lorentz transormations; Invariants and classification of Yang-Mills fields; N*N symmetric matrix; spinor method (1977)",
+      "CN Yang - 1le, about SO<sub>4</sub> symmetrical SO<sub>3</sub> gauge fields (1977)",
+      "CN Yang - 1le, about Relevant early papers by H Weyl (1977)",
+      "CN Yang - 1le, ns 4p hw, about SO<sub>4</sub> symmetrical SO<sub>3</sub> gauge fields; Parallel gauge fields (1977)",
+      "CN Yang - 1 le hw xc, about 積分 (1979)",
+      "CN Yang - 2le (ic 1cp), about Aharonov-Bohm effect. (1979)",
+      "Alfred S Goldhaber - 2le (ic 1cp), about Aharonov-Bohm effect. (1979)",
+      "CN Yang - 1le, 1pp, about Stephenson-Kilmister-Yang gravitational theory; Vacuum Solutions with Double Duality Properties of a Quadratic Poincaré Gauge Field Theory (1980)",
+      "CN Yang - 1le, about references of non-radiative motions in electromagnetism (1980)",
+      "Shang-Chen Chou - 1le hw, about cube puzzle (1980)",
+      "CN Yang - 1le hw, about cube puzzle (1980)",
+      "Peter L Renz - 6le, about plans for Yang's Selected Papers; obtain permission from journals; Offer from Springer-Verlag (1981)",
+      "CN Yang - 1le hw xc, about Q. lattice gas; Boltzmann (1981)",
+      "CN Yang - 6le, about plans for Yang's Selected Papers; obtain permission from journals; Offer from Springer-Verlag (1981)",
+      "Walter Kaufmann-Buhler - 6le, about plans for Yang's Selected Papers; obtain permission from journals; Offer from Springer-Verlag (1981)",
+      "Lisa Arnold - 6le, about plans for Yang's Selected Papers; obtain permission from journals; Offer from Springer-Verlag (1981)",
+      "CN Yang - 1le hw, about references on the space group (1982)",
+      "CN Yang - 1le, about Pellegrini, De Martini和Boscolo的文章 (1983)",
+      "CN Yang - 1photo, about Letter from C.S. Wu to CNY, July 9, 1983. (1983)",
+      "CN Yang - 11le hw xc, ns 1p hw, about calculations on the thermodynamic properties of liquid <sup>3</sup>He – <sup>4</sup>He mixtures in the limit of zero temperature, in the pressure range between 0 and 20 atm (1984)",
+      "CN Yang - 3le, about write about CY Chao (1984)",
+      "CN Yang - 2le, about comment on CY Chao (1985)",
+      "CN Yang - 1le, about Recollections of Occhialini, by S Hayakawa; Veppo Occhialini's comment on Chao's work (1985)",
+      "Marshall Rosenbluth - 2photo, about Letter from Marshall Rosenbluth to CNY, June 10, 1986. (1986)",
+      "CN Yang - 2photo, about Letter from Marshall Rosenbluth to CNY, June 10, 1986. (1986)",
+      "CN Yang - 2le, about Stranathan's book; professor Chao (1986)",
+      "Lucy Hsu - 3le, about 8月2日電報; 與鄧稼先一起的相片; 鄧稼先去世的消息 (1986)",
+      "CN Yang - 3le, about 8月2日電報; 與鄧稼先一起的相片; 鄧稼先去世的消息 (1986)",
+      "CN Yang - 1le, about 對稱 (1986)",
+      "CN Yang - 2le, about Derivation of Klein-Nishina Formula; ∞ sea idea; 王淦昌先生的意見; 自然雜誌 (1986)",
+      "Bing-An Li - 2le, about Derivation of Klein-Nishina Formula; ∞ sea idea; 王淦昌先生的意見; 自然雜誌 (1986)",
+      "CN Yang - 1le, about Grand state energy = −2(2Κ+1) (1987)",
+      "CN Yang - 1le, about二次matrix element的計算結果; High-temperature superconductor (1988)",
+      "CN Yang - 1le hw, about η pairing (1989)",
+      "CN Yang - 1photo, about 1989年吳大猷回CN Yang信函. (1989)",
+      "Robert R. Lewis - 1le, about six-pole field (1989)",
+      "CN Yang - ns 27p hw, about Gu-Yang papers; Fermion lattice gas; 馮明光89年3月2日之信件 (1989)",
+      "CN Yang - 1photo, about 1989年CN Yang致吳大猷信函. (1989)",
+      "CN Yang - 1le, about Second-order Degenerate Perturbation Calculation; 吳大峻在上海的房子的情況 (1989)",
+      "CN Yang - 1le, about six-pole field (1989)",
+      "CN Yang - 2le, about 2Δ/kT<sub>c</sub> ~ 6-8; flux quantization; density matrix; Hubbard model (1989)",
+      "CN Yang - 1le, ns 11p hw, about Pinned flux bundles; method of image; H Field of Tonomura (1990)",
+      "CN Yang - 2le, about thanks letter; preprints; Bethe wavefunction; μ pairing (1990)",
+      "Kuan-Chung Chang - 1le, about Salzer & Richmond的論文 (1991)",
+      "CN Yang - 1le, about Salzer & Richmond的論文 (1991)",
+      "CN Yang - 1le, about C<Sub>60</Sub>; C<Sub>72</Sub> (1991)",
+      "Chen Ning Yang - 11le, about non-degenerate zero eigenvector problem; degeneracy problem; corrected item A; result of F and G; p = +1; changing alpha problem;\n bitnet (A); great complications for the 5+ (1992)",
+      "Chen Ning Yang - 3le, about computer graphics for C<sub>240</sub>; Polynomials for C<sub>240</sub> (1992)",
+      "CN Yang - 4le, about IPR cases; case of a cap with hexagon number 7 + 6m and diagrams; Carbon 70; Carbon 72; Carbon 74; Carbon 76; IPR C_60 (1992)",
+      "Chin Han Sah - 4le, about IPR cases; case of a cap with hexagon number 7 + 6m and diagrams; Carbon 70; Carbon 72; Carbon 74; Carbon 76; IPR C_60 (1992)",
+      "Alfred S Goldhaber - 1le, about Aharonov-Anandan case (1993)",
+      "Frank Yang - 2le, about correction to earlier fax; found mistake in Ahavonov + Anannda's manuscript (1993)"
+    ]
+  },
+  {
+    "name": "Brookhaven National Laboratory",
+    "lat": 40.8745,
+    "lon": -72.8667,
+    "country": "United States",
+    "count": 3,
+    "desc": [
+      "Ralph P Shutt - 1le, about Answer the question that Ralph raised about the report by Yang and Christian (1953)",
+      "Arthur Roberts - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "Li-Hua Yu - 1le, about Pellegrini, De Martini和Boscolo的文章 (1983)"
+    ]
+  },
+  {
+    "name": "California Institute of Technology (Caltech)",
+    "lat": 34.137,
+    "lon": -118.1253,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Carl D Anderson - 2le, about comment on CY Chao (1985)"
+    ]
+  },
+  {
+    "name": "Columbia University / Columbia University (Professor Emerita, having retired in 1981)",
+    "lat": 40.8078,
+    "lon": -73.9625,
+    "country": "United States",
+    "count": 5,
+    "desc": [
+      "Gian Carlo Wick - 1le, about Question of the assignment for the 33 resonance N* in the SU<sub>3</sub> theory; mass formula for the N* multiplet (1963)",
+      "Gian Carlo Wick - 1le, about The hyperphoton problem (1964)",
+      "Juliet Franzini - 1le, about the asymmetry in the range 560 > m > 540; intrinsically greater errors in momenta measurement (1966)",
+      "Paolo Franzini - 1le, about the asymmetry in the range 560 > m > 540; intrinsically greater errors in momenta measurement (1966)",
+      "Chien-Shiung Wu - 1photo, about Letter from C.S. Wu to CNY, July 9, 1983. (1983)"
+    ]
+  },
+  {
+    "name": "Emory University",
+    "lat": 33.8005,
+    "lon": -84.3172,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Peter Fong - 1le hw xc, about Q. lattice gas; Boltzmann (1981)"
+    ]
+  },
+  {
+    "name": "Harvard University",
+    "lat": 42.3657,
+    "lon": -71.1222,
+    "country": "United States",
+    "count": 11,
+    "desc": [
+      "J Schwinger - 1le (ic 6cp), about The Theory of Quantized Field I; the usual field theory; the transformation on the state vector; relationship between commutation rules and time reversal (1951)",
+      "Julian Schwinger - ns 7p hw(ic 1cp), about β decay in Coulomb Field (1951)",
+      "TT Wu - 3le, about Test run photon problem at M<sub>w</sub> = 800 Mev, photon energy = 10 Bev, with a new set of form factors given by Hand-Miller-Wilson; Neutron form factors; Fuchel's result (1963)",
+      "TT Wu - 4le, about Phase angel of ε; C-P violation; K<sub>L</sub><sup>0</sup> → 2π<sup>0</sup> paper (1966)",
+      "TT Wu - 1le(ic 1pp), about submitting paper; Possible Quantum Number Assignment for J and ψ (3695) (1974)",
+      "Tai Tsun Wu - 1le, about the paper of \"Possible Interactions of the J-particle\" (1975)",
+      "TT Wu - 1 le hw xc, about 積分 (1979)",
+      "Tai Tsun Wu - 1le, about Grand state energy = −2(2Κ+1) (1987)",
+      "TT Wu - 1le, about二次matrix element的計算結果; High-temperature superconductor (1988)",
+      "Tai Tsun Wu - 1le, about Second-order Degenerate Perturbation Calculation; 吳大峻在上海的房子的情況 (1989)",
+      "Tai Tsun Wu - 1le hw, about η pairing (1989)"
+    ]
+  },
+  {
+    "name": "Institute for Advanced Study, Princeton",
+    "lat": 40.3323,
+    "lon": -74.6658,
+    "country": "United States",
+    "count": 34,
+    "desc": [
+      "CN Yang - 1le (ic 6cp), about The Theory of Quantized Field I; the usual field theory; the transformation on the state vector; relationship between commutation rules and time reversal (1951)",
+      "CN Yang - 1le, about Publication of \"The Spontaneous Magnetization of a Two-Dimensional Ising Model\"; Physical Review (1951)",
+      "CN Yang - ns 7p hw(ic 1cp), about β decay in Coulomb Field (1951)",
+      "CN Yang - 1le, about letter to E. Fermi, unpublished (1952)",
+      "CN Yang - 1le, about Answer the question that Ralph raised about the report by Yang and Christian (1953)",
+      "CN Yang - 5le(ic 3cp), about Pauli's equation (1954)",
+      "CN Yang - 1photo, about 致吳大猷的信. (1957年) (1957)",
+      "CN Yang - 2le, about a talk about the meaning of parity conservation in general; a thanks letter to Wu for initiated Yang into the field of symmetry laws and group theory in the spring of 1942 (1957)",
+      "CN Yang - 1photo, about 吳大猷回信. (1957年) (1957)",
+      "CN Yang - 2le, about Wood's paper; free energy for hard spheres near the closest packing (1958)",
+      "CN Yang - ns 5p hw, 2le, about Cylinder case; London equation; Axial symmetry; Derivation of Yang's equation (3); Letters of CN Yang, Nina, Deaver and Fairbank; Solutions to Bogolubov's integral equation; Glashow' calculation and experiment (1961)",
+      "CN Yang - 1le, about Formulation of the (Κ<sup>-</sup>ρ) problem (1961)",
+      "CN Yang - 3le, about Para particles; Yukawa interaction; Fermi interaction; Are there particles in nature other than bosons and fermions, by A Messiah & OW Greenberg; exactly soluble field theoretic model (1963)",
+      "CN Yang - 1le, about Question of the assignment for the 33 resonance N* in the SU<sub>3</sub> theory; mass formula for the N* multiplet (1963)",
+      "CN Yang - 1le, about question of poles, symmetry and mass formula (1963)",
+      "Robert Oakes - 1le, about Mass formula for the 10-fold P<sub>3/2</sub> resonances in unitary symmetry (1963)",
+      "CN Yang - 1le, ns 2p hw, about Hard sphere problem; Explicit eqn for γ<sub>e</sub> (1963)",
+      "CN Yang - 1le, about Mass formula for the 10-fold P<sub>3/2</sub> resonances in unitary symmetry (1963)",
+      "CN Yang - 3le, about Test run photon problem at M<sub>w</sub> = 800 Mev, photon energy = 10 Bev, with a new set of form factors given by Hand-Miller-Wilson; Neutron form factors; Fuchel's result (1963)",
+      "CN Yang - 1le, about Dalitz's point; 2 channel π°p ↔ π<sup>+</sup>n problem (1963)",
+      "CN Yang - 3le, about Low energy E<sub>v</sub>; threshold effect; Neutrino; Fuchel's neutrino code; Neutrino additional data from Fuchel (1963)",
+      "Chen Ning Yang - 1le, about A paper: Specific Heats of Fluid Argon near the Critical Point (1963)",
+      "CN Yang - 3le, about Resonances in unitary symmetry; meson-baryon resonances; SU<sub>3</sub> multiplets; pole of the S-matrix (1963)",
+      "CN Yang - 1le, about The hyperphoton problem (1964)",
+      "CN Yang - 1le, about SU<sub>3</sub> (1964)",
+      "CN Yang - 2le, about Unit of the C<sub>v</sub> curve; Measurements of C<sub>v</sub> of Helium (He<sup>4</sup>) near its critical point (1964)",
+      "Chen Ning Yang - 1le, about Calculation on N*<sub>3/2</sub> (1964)",
+      "CN Yang - 1le, about long-range scalar field potential (1964)",
+      "CN Yang - 1le, about Results of a partial wave analysis of the dipion coming form reactions π + N → π<sup>+</sup> + π<sup>–</sup> + N (1964)",
+      "Yao - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "MC Li - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "CN Yang - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)",
+      "CN Yang - 1le, about The sign of β for the Λ decay (1965)",
+      "CN Yang - 2le, about Second derivative of P respect to T becomes infinity at the critical point (1965)"
+    ]
+  },
+  {
+    "name": "Massachusetts Institute of Technology (MIT)",
+    "lat": 42.3583,
+    "lon": -71.0966,
+    "country": "United States",
+    "count": 4,
+    "desc": [
+      "Kerson Huang - 1le, about Physical picture of Hereford's experiment; Phenomenological analysis of the experiment (1966)",
+      "Izzy Singer - 1le, ns 4p hw, about SO<sub>4</sub> symmetrical SO<sub>3</sub> gauge fields; Parallel gauge fields (1977)",
+      "Izzy Singer - 1le, about SO<sub>4</sub> symmetrical SO<sub>3</sub> gauge fields (1977)",
+      "Izzy Singer - 1le, 1p idx on folder, about SO<sub>4</sub> symmetrical SO<sub>3</sub> gauge fields (1977)"
+    ]
+  },
+  {
+    "name": "Northwestern University",
+    "lat": 42.0557,
+    "lon": -87.6753,
+    "country": "United States",
+    "count": 2,
+    "desc": [
+      "Robert Oakes - 1le, about question of poles, symmetry and mass formula (1963)",
+      "Robert Oakes - 1le, about Dalitz's point; 2 channel π°p ↔ π<sup>+</sup>n problem (1963)"
+    ]
+  },
+  {
+    "name": "Princeton University",
+    "lat": 40.3387,
+    "lon": -74.6584,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "James W Cronin - 1le, about the process K<sub>L</sub> → π<sup>0</sup>e<sup>–</sup> e<sup>+</sup> is forbidden for one photon exchange diagram if all interactions CP is conserved (1967)"
+    ]
+  },
+  {
+    "name": "Rockefeller Institute (later Rockefeller University)",
+    "lat": 39.8996,
+    "lon": -74.9533,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Abraham Pais - 1le, ns 2p hw, about Hard sphere problem; Explicit eqn for γ<sub>e</sub> (1963)"
+    ]
+  },
+  {
+    "name": "Rockefeller University",
+    "lat": 40.7624,
+    "lon": -73.9558,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "TT Chou - 3le, about computer graphics for C<sub>240</sub>; Polynomials for C<sub>240</sub> (1992)"
+    ]
+  },
+  {
+    "name": "Stanford University",
+    "lat": 37.4313,
+    "lon": -122.1694,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "William A Little - 2le, about Unit of the C<sub>v</sub> curve; Measurements of C<sub>v</sub> of Helium (He<sup>4</sup>) near its critical point (1964)"
+    ]
+  },
+  {
+    "name": "State University of New York at Stony Brook",
+    "lat": 40.9091,
+    "lon": -73.1206,
+    "country": "United States",
+    "count": 3,
+    "desc": [
+      "Ling Lie Wang - 3le, about Anandan's calculations; Lorentz transormations; Invariants and classification of Yang-Mills fields; N*N symmetric matrix; spinor method (1977)",
+      "Jeeva S Anandan - 3le, about Anandan's calculations; Lorentz transormations; Invariants and classification of Yang-Mills fields; N*N symmetric matrix; spinor method (1977)",
+      "William I Weisberger - 2le (ic 1cp), about Aharonov-Bohm effect. (1979)"
+    ]
+  },
+  {
+    "name": "University of California, Berkeley (Department of Mathematics)",
+    "lat": 33.6488,
+    "lon": -117.8365,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Shiing-Shen Chern - 4le, ns 23p hw, about Parallel displacement gauge field; [Φ, Φ] = 0 (1974)"
+    ]
+  },
+  {
+    "name": "University of Chicago (Enrico Fermi Institute) / University of Chicago (Institute for Nuclear Studies)",
+    "lat": 33.9718,
+    "lon": -117.3485,
+    "country": "United States",
+    "count": 3,
+    "desc": [
+      "Enrico Fermi - 1le, about letter to E. Fermi, unpublished (1952)",
+      "RH Dalitz - 1le, about Mass formula for the 10-fold P<sub>3/2</sub> resonances in unitary symmetry (1963)",
+      "RH Dalitz - 3le, about Resonances in unitary symmetry; meson-baryon resonances; SU<sub>3</sub> multiplets; pole of the S-matrix (1963)"
+    ]
+  },
+  {
+    "name": "University of Hawaii at Manoa",
+    "lat": 21.2983,
+    "lon": -157.8187,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "San Fu Tuan - 1le, about the paper of \"Possible Interactions of the J-particle\" (1975)"
+    ]
+  },
+  {
+    "name": "University of Houston (Texas Center for Superconductivity)",
+    "lat": 29.7208,
+    "lon": -95.3441,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Paul Ching Wu Chu - 2le, about 2Δ/kT<sub>c</sub> ~ 6-8; flux quantization; density matrix; Hubbard model (1989)"
+    ]
+  },
+  {
+    "name": "University of Maryland",
+    "lat": 38.9904,
+    "lon": -76.9439,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Oscar W Greenberg - 3le, about Para particles; Yukawa interaction; Fermi interaction; Are there particles in nature other than bosons and fermions, by A Messiah & OW Greenberg; exactly soluble field theoretic model (1963)"
+    ]
+  },
+  {
+    "name": "University of Michigan",
+    "lat": 42.2942,
+    "lon": -83.71,
+    "country": "United States",
+    "count": 4,
+    "desc": [
+      "George Uhlenbeck - 2le, about Wood's paper; free energy for hard spheres near the closest packing (1958)",
+      "CT Wu - 3le, about Test run photon problem at M<sub>w</sub> = 800 Mev, photon energy = 10 Bev, with a new set of form factors given by Hand-Miller-Wilson; Neutron form factors; Fuchel's result (1963)",
+      "Alfred C.T. Wu - 3le, about Low energy E<sub>v</sub>; threshold effect; Neutrino; Fuchel's neutrino code; Neutrino additional data from Fuchel (1963)",
+      "Tomozawa - 5le, about the parameterization in the reprints of Aubert et al and Baldo-Ceolin et al; CP noninvariance (1965)"
+    ]
+  },
+  {
+    "name": "University of Missouri-Columbia",
+    "lat": 38.9364,
+    "lon": -92.3297,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Sam Werner - 2le, about correction to earlier fax; found mistake in Ahavonov + Anannda's manuscript (1993)"
+    ]
+  },
+  {
+    "name": "University of Nebraska",
+    "lat": 40.8206,
+    "lon": -96.7026,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Saul Epstein - 1le, about long-range scalar field potential (1964)"
+    ]
+  },
+  {
+    "name": "University of Pittsburgh",
+    "lat": 40.4442,
+    "lon": -79.9625,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "R Roskies - 3le, about Anandan's calculations; Lorentz transormations; Invariants and classification of Yang-Mills fields; N*N symmetric matrix; spinor method (1977)"
+    ]
+  },
+  {
+    "name": "University of Rochester",
+    "lat": 43.1299,
+    "lon": -77.6288,
+    "country": "United States",
+    "count": 2,
+    "desc": [
+      "Bob - 3le, about Resonances in unitary symmetry; meson-baryon resonances; SU<sub>3</sub> multiplets; pole of the S-matrix (1963)",
+      "DH Douglass Jr. - 2le, about Second derivative of P respect to T becomes infinity at the critical point (1965)"
+    ]
+  },
+  {
+    "name": "University of Tennessee (or affiliated national laboratory)",
+    "lat": 35.9516,
+    "lon": -83.9309,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "JW Johnson - 1le, about A paper: Specific Heats of Fluid Argon near the Critical Point (1963)"
+    ]
+  },
+  {
+    "name": "University of Utah",
+    "lat": 40.7628,
+    "lon": -111.8369,
+    "country": "United States",
+    "count": 1,
+    "desc": [
+      "Bill Sutherland - 2le, about thanks letter; preprints; Bethe wavefunction; μ pairing (1990)"
+    ]
+  },
+  {
+    "name": "University of Virginia",
+    "lat": 38.0411,
+    "lon": -78.5055,
+    "country": "United States",
+    "count": 2,
+    "desc": [
+      "Frank L Hereford - 1le, about Physical picture of Hereford's experiment; Phenomenological analysis of the experiment (1966)",
+      "PK Kabir - 2le, about Incoherent source of K<sub>S</sub> and K<sub>L</sub>; CP violation (1973)"
+    ]
+  },
+  {
+    "name": "Yale University",
+    "lat": 41.2571,
+    "lon": -72.9897,
+    "country": "United States",
+    "count": 2,
+    "desc": [
+      "Robert Oakes - 3le, about Resonances in unitary symmetry; meson-baryon resonances; SU<sub>3</sub> multiplets; pole of the S-matrix (1963)",
+      "Gregory Breit - 1le, about Calculation on N*<sub>3/2</sub> (1964)"
+    ]
+  },
+  {
+    "name": "Unknown",
+    "lat": 5.3566,
+    "lon": 95.4706,
+    "country": "Unknown",
+    "count": 1,
+    "desc": [
+      "Robert (Bob) Craig - 1le, about SU<sub>3</sub> (1964)"
+    ]
+  }
+];
+
+/* ============================================================
+   I18N — unchanged
+   ============================================================ */
+const I18N={zh:{title:'楊振寧學術通信',loading:'載入中',sT:'統計摘要',lo:'地點總數',en:'通信條目',co:'活躍連線',yr:'年份範圍',fT:'年份篩選',sy:'起始年',ey:'結束年',lT:'國家圖例',bt:'亮度 = 通信數量 · 流光連線動態更新',items:'項通信',
+cn:{'United States':'美國','China':'中國','United Kingdom':'英國','France':'法國','Germany':'德國','Italy':'義大利','Japan':'日本','India':'印度','Israel':'以色列','Sweden':'瑞典','Switzerland':'瑞士','Netherlands':'荷蘭','Poland':'波蘭','Canada':'加拿大','Taiwan':'臺灣 (中華人民共和國)','Unknown':'未知'}},
+en:{title:'C.N. Yang Correspondence',loading:'Loading',sT:'Statistics',lo:'Locations',en:'Correspondence',co:'Connections',yr:'Year Range',fT:'Year Filter',sy:'Start Year',ey:'End Year',lT:'Country Legend',bt:'Brightness = correspondence count · Animated beam links',items:'items',
+cn:{'United States':'US','China':'China','United Kingdom':'UK','France':'France','Germany':'Germany','Italy':'Italy','Japan':'Japan','India':'India','Israel':'Israel','Sweden':'Sweden','Switzerland':'Switzerland','Netherlands':'Netherlands','Poland':'Poland','Canada':'Canada','Taiwan(PRC)':'Taiwan (People\'s Republic of China)','Unknown':'Unknown'}}};
+let lang='zh';
+function sL(l){
+  lang=l;
+  document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('a',(l==='zh'&&b.textContent==='繁中')||(l==='en'&&b.textContent==='EN')));
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(I18N[l][k])el.textContent=I18N[l][k];});
+  document.title=I18N[l].title;
+  bL();
+  updateCountryLabels();
+}
+function cn(c){return I18N[lang].cn[c]||c;}
+
+/* ============================================================
+   MERGE & CONNECTIONS — ★ MODIFIED ★
+   以 dKey（去掉人名後的信件主題）為唯一鍵做全局去重
+   ============================================================ */
+let ML=[],CONN=[];
+function getYr(d){const m=d.match(/\((\d{4})\)\s*$/);return m?+m[1]:null;}
+function dKey(d){const i=d.indexOf(' - ');return i>=0?d.substring(i+3).trim():d;}
+function dPerson(d){const i=d.indexOf(' - ');return i>=0?d.substring(0,i).trim():'';}
+
+function mergeLocs(){
+  const m={};
+  LOCS.forEach((loc,i)=>{
+    const k=loc.lat.toFixed(4)+','+loc.lon.toFixed(4);
+    if(!m[k]){m[k]={names:[loc.name],lat:loc.lat,lon:loc.lon,country:loc.country,count:0,desc:[],origIdx:[i]};}
+    else{m[k].names.push(loc.name);m[k].origIdx.push(i);}
+    m[k].count+=loc.count;
+    m[k].desc=m[k].desc.concat(loc.desc);
+  });
+  ML=Object.values(m);
+}
+
+/* ★ NEW — 取代舊 buildConn + mergeDescriptions ★
+   回傳 { dm, locCorr }
+     dm      : Map<dKey, [{locIdx,person,year,rawDesc}]>  — 全局通信目錄
+     locCorr : Map<locIdx, Map<dKey, corrInfo>>            — 每地點去重後的通信
+*/
+function buildCorrespondencesAndConnections(ys, ye){
+  // 1. 以 dKey 為鍵，跨所有地點收集條目
+  const dm = new Map();
+  ML.forEach((loc,i)=>{
+    loc.desc.forEach(d=>{
+      const yr = getYr(d);
+      if(yr!==null && (yr<ys||yr>ye)) return;
+      const key = dKey(d);
+      const person = dPerson(d);
+      if(!dm.has(key)) dm.set(key,[]);
+      dm.get(key).push({locIdx:i, person, year:yr, rawDesc:d});
+    });
+  });
+
+  // 2. 根據通信目錄建立連線
+  const cm = {};
+  dm.forEach((entries)=>{
+    const ul = [...new Set(entries.map(e=>e.locIdx))];
+    if(ul.length<2) return;
+    // hub = Yang 所在地
+    let hub = ul[0];
+    const ye2 = entries.find(e=>e.person==='CN Yang'||e.person==='Chen Ning Yang'||e.person==='Frank Yang');
+    if(ye2) hub = ye2.locIdx;
+    if(ul.length===2){
+      const a=Math.min(ul[0],ul[1]),b=Math.max(ul[0],ul[1]);
+      const ck=a+'|'+b; if(!cm[ck]) cm[ck]={a,b,n:0}; cm[ck].n++;
+    } else {
+      ul.forEach(l=>{if(l!==hub){
+        const a=Math.min(hub,l),b=Math.max(hub,l);
+        const ck=a+'|'+b; if(!cm[ck]) cm[ck]={a,b,n:0}; cm[ck].n++;
+      }});
+    }
+  });
+  CONN = Object.values(cm);
+
+  // 3. 為每個地點建立去重後的通信清單
+  const locCorr = new Map();
+  dm.forEach((entries, key)=>{
+    // 收集所有涉及的人
+    const allPersons = [...new Set(entries.map(e=>e.person))];
+    const year = entries[0]?.year;
+    // 按地點分組
+    const byLoc = new Map();
+    entries.forEach(e=>{
+      if(!byLoc.has(e.locIdx)) byLoc.set(e.locIdx, new Set());
+      byLoc.get(e.locIdx).add(e.person);
+    });
+    byLoc.forEach((localSet, locIdx)=>{
+      if(!locCorr.has(locIdx)) locCorr.set(locIdx, new Map());
+      locCorr.get(locIdx).set(key, {
+        localPersons: [...localSet],
+        allPersons,
+        year,
+        detail: key
+      });
+    });
+  });
+
+  return { dm, locCorr };
+}
+
+/* ============================================================
+   PAIR COLORS — unchanged
+   ============================================================ */
+const PC={};
+function pk(c1,c2){return [c1,c2].sort().join('|');}
+const PAL={'United States|United States':'#546e7a','China|United States':'#ff9800','United Kingdom|United States':'#00bcd4','France|United States':'#ab47bc','Germany|United States':'#4caf50','India|United States':'#f44336','Israel|United States':'#2196f3','Italy|United States':'#e91e63','Japan|United States':'#ff5722','Netherlands|United States':'#8bc34a','Poland|United States':'#cddc39','Sweden|United States':'#ffeb3b','Switzerland|United States':'#009688','Canada|United States':'#03a9f4','Taiwan(PRC)|United States':'#ff6f00','China|Taiwan':'#ffab40','Unknown|United States':'#78909c','China|Japan':'#f06292','China|China':'#ff8a65','India|United States':'#ef5350','Italy|France':'#ce93d8','Italy|United States':'#e91e63','United Kingdom|United States':'#00bcd4'};
+function pairColor(c1,c2){return PAL[pk(c1,c2)]||'#7986cb';}
+
+/* ============================================================
+   THREE.JS — unchanged (init, makeStars, globe, etc.)
+   ============================================================ */
+let scene,camera,renderer,labelRenderer,controls,clock;
+let mGrp,aGrp,bGrp,countryGroup;
+let mkrs=[],beams=[];
+const R=5,SEG=64;
+
+function ll2v(la,lo,r){
+  const p=(90-la)*Math.PI/180,t=(lo+180)*Math.PI/180;
+  return new THREE.Vector3(-r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t));
+}
+
+let _gt;
+function gTex(){
+  if(_gt)return _gt;
+  const c=document.createElement('canvas');c.width=128;c.height=128;
+  const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
+  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(0.06,'rgba(255,255,255,0.9)');
+  g.addColorStop(0.2,'rgba(180,220,255,0.5)');g.addColorStop(0.45,'rgba(80,150,255,0.12)');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=g;x.fillRect(0,0,128,128);
+  _gt=new THREE.CanvasTexture(c);return _gt;
+}
+
+function makeProceduralTex(){
+  const c=document.createElement('canvas');c.width=2048;c.height=1024;
+  const x=c.getContext('2d');
+  const gr=x.createLinearGradient(0,0,0,1024);
+  gr.addColorStop(0,'#030810');gr.addColorStop(0.3,'#050d1a');gr.addColorStop(0.5,'#061020');gr.addColorStop(0.7,'#050d1a');gr.addColorStop(1,'#030810');
+  x.fillStyle=gr;x.fillRect(0,0,2048,1024);
+  x.strokeStyle='rgba(20,50,80,0.08)';x.lineWidth=0.5;
+  for(let la=-80;la<=80;la+=15){const y=(90-la)/180*1024;x.beginPath();x.moveTo(0,y);x.lineTo(2048,y);x.stroke();}
+  for(let lo=-180;lo<180;lo+=15){const xx=(lo+180)/360*2048;x.beginPath();x.moveTo(xx,0);x.lineTo(xx,1024);x.stroke();}
+  return new THREE.CanvasTexture(c);
+}
+
+const countryData = [
+  { code: 'US', nameEn: 'United States', nameZh: '美國', lat: 39.8, lon: -98.5 },
+  { code: 'CN', nameEn: 'China', nameZh: '中國', lat: 35.0, lon: 105.0 },
+  { code: 'GB', nameEn: 'United Kingdom', nameZh: '英國', lat: 54.0, lon: -2.0 },
+  { code: 'FR', nameEn: 'France', nameZh: '法國', lat: 46.5, lon: 2.5 },
+  { code: 'DE', nameEn: 'Germany', nameZh: '德國', lat: 51.0, lon: 10.0 },
+  { code: 'IT', nameEn: 'Italy', nameZh: '義大利', lat: 42.5, lon: 12.5 },
+  { code: 'JP', nameEn: 'Japan', nameZh: '日本', lat: 36.0, lon: 138.0 },
+  { code: 'IN', nameEn: 'India', nameZh: '印度', lat: 22.0, lon: 78.0 },
+  { code: 'CA', nameEn: 'Canada', nameZh: '加拿大', lat: 56.0, lon: -106.0 },
+  { code: 'TW', nameEn: 'Taiwan (People\'s Republic of China)', nameZh: '臺灣 (中華人民共和國)', lat: 23.5, lon: 121.0 },
+  { code: 'IL', nameEn: 'Israel', nameZh: '以色列', lat: 31.0, lon: 34.8 },
+  { code: 'SE', nameEn: 'Sweden', nameZh: '瑞典', lat: 62.0, lon: 15.0 },
+  { code: 'CH', nameEn: 'Switzerland', nameZh: '瑞士', lat: 46.8, lon: 8.2 },
+  { code: 'NL', nameEn: 'Netherlands', nameZh: '荷蘭', lat: 52.5, lon: 5.5 },
+  { code: 'PL', nameEn: 'Poland', nameZh: '波蘭', lat: 52.0, lon: 19.0 }
+];
+
+function createCountryLabels() {
+  if (countryGroup) scene.remove(countryGroup);
+  countryGroup = new THREE.Group();
+  countryData.forEach(c => {
+    const pos = ll2v(c.lat, c.lon, R + 0.25);
+    const div = document.createElement('div');
+    div.className = 'country-label';
+    div.textContent = lang === 'zh' ? c.nameZh : c.nameEn;
+    const label = new THREE.CSS2DObject(div);
+    label.position.copy(pos);
+    label.userData = { code: c.code, nameZh: c.nameZh, nameEn: c.nameEn };
+    countryGroup.add(label);
+  });
+  scene.add(countryGroup);
+}
+
+function updateCountryLabels() {
+  if (!countryGroup) return;
+  countryGroup.children.forEach(label => {
+    label.element.textContent = lang === 'zh' ? label.userData.nameZh : label.userData.nameEn;
+  });
+}
+
+function init(){
+  clock=new THREE.Clock();
+  scene=new THREE.Scene();
+  scene.background = new THREE.Color(0x0c1420);
+  camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,0.1,1000);
+  camera.position.set(0,4,15);
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setClearColor(0x0c1420);
+  document.getElementById('container').appendChild(renderer.domElement);
+
+  labelRenderer = new THREE.CSS2DRenderer();
+  labelRenderer.setSize(innerWidth, innerHeight);
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0px';
+  labelRenderer.domElement.style.left = '0px';
+  labelRenderer.domElement.style.pointerEvents = 'none';
+  labelRenderer.domElement.style.zIndex = '10';
+  document.getElementById('container').appendChild(labelRenderer.domElement);
+
+  controls=new THREE.OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true;controls.dampingFactor=0.06;controls.rotateSpeed=0.45;
+  controls.minDistance=7;controls.maxDistance=28;controls.enablePan=false;controls.autoRotate=false;
+
+  scene.add(new THREE.AmbientLight(0x446688, 0.8));
+  const dl=new THREE.DirectionalLight(0xaaccff,0.8);dl.position.set(5,3,5);scene.add(dl);
+
+  makeStars();
+  const gm=new THREE.MeshPhongMaterial({map:makeProceduralTex(),shininess:4,emissive:0x112233});
+  const globe=new THREE.Mesh(new THREE.SphereGeometry(R,SEG,SEG),gm);
+  scene.add(globe);
+  const tl=new THREE.TextureLoader();
+  tl.load('https://unpkg.com/three-globe@2.31.0/example/img/earth-night.jpg',t=>{gm.map=t;gm.needsUpdate=true;},undefined,()=>{
+    tl.load('https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-night.jpg',t=>{gm.map=t;gm.needsUpdate=true;},undefined,()=>{});
+  });
+  const am=new THREE.ShaderMaterial({
+    vertexShader:'varying vec3 vN;varying vec3 vP;void main(){vN=normalize(normalMatrix*normal);vP=(modelViewMatrix*vec4(position,1.0)).xyz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+    fragmentShader:'varying vec3 vN;varying vec3 vP;void main(){vec3 vd=normalize(-vP);float i=pow(1.0-dot(vd,vN),3.2);gl_FragColor=vec4(0.2,0.5,1.0,i*0.35);}',
+    transparent:true,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false});
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.14,SEG,SEG),am));
+
+  mGrp=new THREE.Group();aGrp=new THREE.Group();bGrp=new THREE.Group();
+  scene.add(mGrp);scene.add(aGrp);scene.add(bGrp);
+
+  mergeLocs();
+  createCountryLabels();
+  rebuild();
+
+  renderer.domElement.addEventListener('mousemove',onMM);
+  renderer.domElement.addEventListener('click',onCl);
+  addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);labelRenderer.setSize(innerWidth,innerHeight);});
+  document.getElementById('ld').classList.add('h');
+  animate();
+}
+
+function makeStars(){
+  const g=new THREE.BufferGeometry(),p=new Float32Array(6000*3);
+  for(let i=0;i<6000;i++){const r=120+Math.random()*400,th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);p[i*3]=r*Math.sin(ph)*Math.cos(th);p[i*3+1]=r*Math.sin(ph)*Math.sin(th);p[i*3+2]=r*Math.cos(ph);}
+  g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:0.6,transparent:true,opacity:0.55,sizeAttenuation:true})));
+}
+
+function clearViz(){
+  [mGrp,aGrp,bGrp].forEach(grp=>{while(grp.children.length){const ch=grp.children[0];if(ch.geometry)ch.geometry.dispose();if(ch.material){if(ch.material.map&&ch.material.map!==gTex())ch.material.map.dispose();ch.material.dispose();}grp.remove(ch);}});
+  mkrs=[];beams=[];
+}
+
+/* ============================================================
+   ★ MODIFIED — rebuild()
+   使用全局通信目錄去重後的計數
+   ============================================================ */
+function rebuild(){
+  clearViz();
+  const ys=+document.getElementById('rs').value, ye=+document.getElementById('re').value;
+
+  // ★ 用新的全局去重函式
+  const { dm, locCorr } = buildCorrespondencesAndConnections(ys, ye);
+
+  // 為每個地點產生去重後的通信列表
+  const fML = ML.map((loc,i)=>{
+    const corrMap = locCorr.get(i);
+    const corrs = corrMap ? Array.from(corrMap.values()) : [];
+    return {...loc, corrs, fcount: corrs.length, idx:i};
+  }).filter(l=>l.fcount>0);
+
+  const mx=Math.max(...fML.map(l=>l.fcount),1);
+
+  // Markers
+  fML.forEach(loc=>{
+    const int=loc.fcount/mx;
+    const pos=ll2v(loc.lat,loc.lon,R*1.005);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(),color:new THREE.Color().setHSL(0.12+int*0.05,0.85,0.5+int*0.4),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.4+int*0.6}));
+    const sc=0.15+int*0.55;sp.scale.set(sc,sc,1);sp.position.copy(pos);
+    sp.userData={...loc,int,baseScale:sc,isMkr:true};
+    mGrp.add(sp);mkrs.push(sp);
+    const inner=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(),color:0xffffff,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0.3+int*0.7}));
+    const is=0.03+int*0.1;inner.scale.set(is,is,1);inner.position.copy(pos);
+    mGrp.add(inner);
+  });
+
+  // Arcs — unchanged logic
+  CONN.forEach(c=>{
+    const la=ML[c.a],lb=ML[c.b];
+    const col=pairColor(la.country,lb.country);
+    const sv=ll2v(la.lat,la.lon,R*1.003),ev=ll2v(lb.lat,lb.lon,R*1.003);
+    const dist=sv.distanceTo(ev);
+    const mid=sv.clone().add(ev).multiplyScalar(0.5);
+    mid.normalize().multiplyScalar(R+dist*0.35);
+    const curve=new THREE.QuadraticBezierCurve3(sv,mid,ev);
+    const pts=curve.getPoints(80);
+    const ag=new THREE.BufferGeometry().setFromPoints(pts);
+    aGrp.add(new THREE.Line(ag,new THREE.LineBasicMaterial({color:new THREE.Color(col),transparent:true,opacity:0.1,blending:THREE.AdditiveBlending,depthWrite:false})));
+    const spd=0.08+Math.random()*0.1;
+    const phase=Math.random();
+    for(let ti=0;ti<3;ti++){
+      const bm=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(),color:new THREE.Color(col),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:ti===0?0.9:ti===1?0.4:0.12}));
+      const bs=(0.06+(c.n/20)*0.08)*(ti===0?1:ti===1?0.65:0.4);
+      bm.scale.set(bs,bs,1);
+      bm.userData={pts,prog:phase,spd,trail:ti*0.04,bs};
+      bGrp.add(bm);beams.push(bm);
+    }
+  });
+
+  // ★ 統計：通信條目 = 全局唯一通信數 dm.size
+  document.getElementById('vl').textContent=fML.length;
+  document.getElementById('ve').textContent=dm.size;          // ← 改為全局去重數
+  document.getElementById('vc').textContent=CONN.length;
+  document.getElementById('vy').textContent=ys+'–'+ye;
+  document.getElementById('ys').textContent=ys;
+  document.getElementById('ye').textContent=ye;
+  bL();
+}
+
+function bL(){
+  const el=document.getElementById('lgb');el.innerHTML='';
+  const pairs=new Set();
+  CONN.forEach(c=>{pairs.add(pk(ML[c.a].country,ML[c.b].country));});
+  Array.from(pairs).sort().forEach(p=>{
+    const [c1,c2]=p.split('|');
+    const col=PAL[p]||'#7986cb';
+    const label=c1===c2?(cn(c1)+(lang==='zh'?'國內':' Domestic')):(cn(c1)+' ↔ '+cn(c2));
+    const d=document.createElement('div');d.className='li';
+    d.innerHTML='<div class="lc" style="background:'+col+';box-shadow:0 0 6px '+col+'"></div><span>'+label+'</span>';
+    el.appendChild(d);
+  });
+}
+
+// ===== FILTER =====
+let fTo;
+function oF(){
+  let s=+document.getElementById('rs').value,e=+document.getElementById('re').value;
+  if(s>e){document.getElementById('re').value=s;e=s;}
+  document.getElementById('ys').textContent=s;
+  document.getElementById('ye').textContent=e;
+  clearTimeout(fTo);fTo=setTimeout(rebuild,120);
+}
+
+// ===== PANELS =====
+function tp(el){el.classList.toggle('c');el.nextElementSibling.classList.toggle('c');}
+
+/* ============================================================
+   ★ MODIFIED — showDet()
+   顯示去重後的通信目錄，標明本地人 ↔ 遠端通信者
+   ============================================================ */
+function showDet(loc){
+  const det=document.getElementById('det');
+  document.getElementById('ddn').textContent=loc.names?loc.names.join(' / '):loc.name;
+  document.getElementById('ddc').textContent=cn(loc.country);
+  document.getElementById('ddk').textContent=loc.fcount+' '+I18N[lang].items;
+  const dl=document.getElementById('dl');dl.innerHTML='';
+
+  const corrs=(loc.corrs||[]).slice().sort((a,b)=>(a.year||0)-(b.year||0));
+  corrs.forEach(corr=>{
+    const div=document.createElement('div');div.className='di';
+    const localStr = corr.localPersons.join(', ');
+    const remotePersons = corr.allPersons.filter(p => !corr.localPersons.includes(p));
+    const remoteStr = remotePersons.length>0 ? ' ↔ '+remotePersons.join(', ') : '';
+    const yr=corr.year;
+    div.innerHTML='<span class="dp">'+localStr+'</span>'
+      +(remoteStr?'<span style="opacity:.45;font-size:10px">'+remoteStr+'</span>':'')
+      +(yr?'<span class="dy">('+yr+')</span>':'')
+      +'<div class="dt">'+corr.detail+'</div>';
+    dl.appendChild(div);
+  });
+  det.classList.add('open');
+}
+function cD(){document.getElementById('det').classList.remove('open');}
+
+/* ============================================================
+   INTERACTION — unchanged
+   ============================================================ */
+const ray=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+function onMM(ev){
+  mouse.x=(ev.clientX/innerWidth)*2-1;mouse.y=-(ev.clientY/innerHeight)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const hits=ray.intersectObjects(mkrs);
+  const tip=document.getElementById('tip');
+  if(hits.length>0&&hits[0].object.userData.isMkr){
+    const ud=hits[0].object.userData;
+    document.getElementById('ttn').textContent=(ud.names||[ud.name]).join(', ');
+    document.getElementById('tti').textContent=cn(ud.country)+' · '+(ud.fcount||ud.count)+' '+I18N[lang].items;
+    tip.style.display='block';
+    let tx=ev.clientX+14,ty=ev.clientY-8;
+    if(tx+220>innerWidth)tx=ev.clientX-220;
+    if(ty+50>innerHeight)ty=ev.clientY-50;
+    tip.style.left=tx+'px';tip.style.top=ty+'px';
+    renderer.domElement.style.cursor='pointer';
+  }else{tip.style.display='none';renderer.domElement.style.cursor='grab';}
+}
+function onCl(ev){
+  mouse.x=(ev.clientX/innerWidth)*2-1;mouse.y=-(ev.clientY/innerHeight)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const hits=ray.intersectObjects(mkrs);
+  if(hits.length>0&&hits[0].object.userData.isMkr){showDet(hits[0].object.userData);}
+}
+
+/* ============================================================
+   ANIMATE — unchanged
+   ============================================================ */
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=clock.getDelta(),t=clock.getElapsedTime();
+  controls.update();
+  beams.forEach(bm=>{
+    const u=bm.userData;
+    u.prog+=u.spd*dt;if(u.prog>=1)u.prog-=1;
+    let p=u.prog-u.trail;if(p<0)p+=1;
+    const idx=Math.min(Math.floor(p*(u.pts.length-1)),u.pts.length-1);
+    bm.position.copy(u.pts[idx]);
+    bm.scale.setScalar(u.bs*(1+0.12*Math.sin(t*4+u.prog*10)));
+  });
+  mkrs.forEach((m,i)=>{
+    if(m.userData.baseScale){m.scale.setScalar(m.userData.baseScale*(1+0.06*Math.sin(t*1.8+i*0.5)));}
+  });
+  renderer.render(scene,camera);
+  labelRenderer.render(scene,camera);
+}
+
+init();
+</script>
+</body>
+</html>
